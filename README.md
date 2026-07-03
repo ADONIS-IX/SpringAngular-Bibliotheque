@@ -163,7 +163,7 @@ réservation.
 
 ---
 
-## Couverture des critères d'évaluation du TP
+## Couverture des critères d'évaluation du Projet
 
 - **IoC / DI** : injection par constructeur systématique dans les services.
 - **JPA** : 7 entités, relations `@ManyToOne`/`@OneToMany`/**`@ManyToMany`**, requêtes dérivées + JPQL.
