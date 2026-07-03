@@ -1,21 +1,21 @@
-# 📚 Bibliothèque Universitaire — Application Web Complète
+# Bibliothèque Universitaire — Application Web Complète
 
 Application de gestion d'une bibliothèque universitaire développée dans le cadre du module
 **Développement Backend (Spring Boot) & Frontend (Angular)**.
 
-Le sujet du TP a servi de point de départ ; le projet a été **enrichi** avec des
+**Enrichi** avec des
 fonctionnalités avancées pour dépasser le niveau de base :
 
-- 🔖 **Réservations avec file d'attente FIFO** quand un livre est épuisé
-- 💸 **Pénalités de retard calculées automatiquement** au retour (jours × tarif)
-- 🔔 **Notifications d'échéance** (in-app) via une **tâche planifiée** `@Scheduled`
-- 📊 **Tableau de bord statistiques** pour le bibliothécaire (compteurs + graphiques)
-- ✍️ **Multi-auteurs** : relation **N-N** Livre ↔ Auteur
-- 🅰️ **Frontend Angular complet** (Angular Material) par-dessus l'API
+- **Réservations avec file d'attente FIFO** quand un livre est épuisé
+- **Pénalités de retard calculées automatiquement** au retour (jours × tarif)
+- **Notifications d'échéance** (in-app) via une **tâche planifiée** `@Scheduled`
+- **Tableau de bord statistiques** pour le bibliothécaire (compteurs + graphiques)
+- **Multi-auteurs** : relation **N-N** Livre ↔ Auteur
+- **Frontend Angular complet** (Angular Material) par-dessus l'API
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 SpringAngular/
@@ -46,7 +46,7 @@ SpringAngular/
 
 ---
 
-## 🚀 Démarrage
+## Démarrage
 
 ### Prérequis
 - **JDK 17+** (le projet cible Java 26, mais compile dès 17)
@@ -88,7 +88,7 @@ Application : http://localhost:4200 (le proxy `/api` redirige vers le backend `:
 
 ---
 
-## 👤 Comptes de démonstration
+## Comptes de démonstration
 
 | Rôle | Email | Mot de passe |
 |---|---|---|
@@ -100,7 +100,7 @@ Application : http://localhost:4200 (le proxy `/api` redirige vers le backend `:
 
 ---
 
-## 🔑 Fonctionnalités par rôle
+## Fonctionnalités par rôle
 
 **Étudiant** — parcourir le catalogue, emprunter, **réserver un livre épuisé** (avec position
 dans la file), confirmer une réservation devenue disponible, prolonger un emprunt, consulter
@@ -122,7 +122,7 @@ d'attente), gestion des pénalités, **tableau de bord statistiques**.
 
 ---
 
-## 🌐 Principaux endpoints de l'API
+## Principaux endpoints de l'API
 
 | Méthode | URL | Accès |
 |---|---|---|
@@ -140,7 +140,7 @@ Toutes les routes protégées attendent l'en-tête `Authorization: Bearer <token
 
 ---
 
-## 🧪 Tests
+## Tests
 
 ```bash
 cd BuBackend
@@ -152,7 +152,7 @@ réservation.
 
 ---
 
-## ✅ Couverture des critères d'évaluation du TP
+## Couverture des critères d'évaluation du TP
 
 - **IoC / DI** : injection par constructeur systématique dans les services.
 - **JPA** : 7 entités, relations `@ManyToOne`/`@OneToMany`/**`@ManyToMany`**, requêtes dérivées + JPQL.
