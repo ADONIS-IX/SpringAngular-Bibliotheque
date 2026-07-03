@@ -70,7 +70,7 @@ Console H2 : http://localhost:8080/h2-console (JDBC URL `jdbc:h2:mem:bibliothequ
 
 ```sql
 CREATE DATABASE bibliotheque_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'biblio_user'@'localhost' IDENTIFIED BY 'biblio2026
+CREATE USER 'biblio_user'@'localhost' IDENTIFIED BY 'biblio2026'
 GRANT ALL PRIVILEGES ON bibliotheque_db.* TO 'biblio_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
