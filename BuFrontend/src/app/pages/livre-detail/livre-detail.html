@@ -1,0 +1,65 @@
+<div class="page">
+  <a mat-button routerLink="/catalogue" class="back"><mat-icon>arrow_back</mat-icon> Retour au catalogue</a>
+
+  @if (loading()) {
+    <div class="empty-state"><mat-spinner diameter="40" /></div>
+  } @else if (livre(); as l) {
+    <mat-card class="detail-card">
+      <div class="detail-grid">
+        <div class="cover">
+          <mat-icon>menu_book</mat-icon>
+        </div>
+        <div class="info">
+          <h1>{{ l.titre }}</h1>
+
+          <div class="auteurs">
+            <span class="muted">Auteur(s) :</span>
+            <mat-chip-set>
+              @for (a of l.auteurs; track a.id) {
+                <mat-chip>{{ a.nomComplet }}</mat-chip>
+              }
+            </mat-chip-set>
+          </div>
+
+          <mat-divider />
+
+          <dl class="meta">
+            @if (l.categorie) { <dt>Catégorie</dt><dd>{{ l.categorie }}</dd> }
+            @if (l.anneePublication) { <dt>Année</dt><dd>{{ l.anneePublication }}</dd> }
+            @if (l.isbn) { <dt>ISBN</dt><dd>{{ l.isbn }}</dd> }
+            <dt>Stock</dt>
+            <dd>{{ l.stockDisponible }} / {{ l.stockTotal }} disponible(s)</dd>
+          </dl>
+
+          <div class="statut-ligne">
+            @if (l.disponible) {
+              <span class="chip chip-success">Disponible</span>
+            } @else {
+              <span class="chip chip-danger">Épuisé</span>
+              @if (l.fileAttente > 0) {
+                <span class="chip chip-warn">{{ l.fileAttente }} personne(s) en file d'attente</span>
+              }
+            }
+          </div>
+
+          <div class="actions">
+            @if (l.disponible) {
+              <button mat-flat-button color="primary" (click)="emprunter()" [disabled]="action()">
+                <mat-icon>book</mat-icon> Emprunter
+              </button>
+            } @else {
+              <button mat-flat-button color="accent" (click)="reserver()" [disabled]="action()">
+                <mat-icon>bookmark_add</mat-icon> Réserver (file d'attente)
+              </button>
+            }
+            @if (!isLoggedIn()) {
+              <span class="muted hint">Connexion requise pour emprunter/réserver</span>
+            }
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  } @else {
+    <div class="empty-state"><mat-icon>error_outline</mat-icon><p>Livre introuvable</p></div>
+  }
+</div>

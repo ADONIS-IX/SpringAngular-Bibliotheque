@@ -1,0 +1,51 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Gérer les livres</h1>
+    <button mat-flat-button color="primary" (click)="ouvrir()">
+      <mat-icon>add</mat-icon> Nouveau livre
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="empty-state"><mat-spinner diameter="40" /></div>
+  } @else {
+    <mat-card>
+      <div class="table-scroll">
+        <table mat-table [dataSource]="livres()" class="full-width">
+          <ng-container matColumnDef="titre">
+            <th mat-header-cell *matHeaderCellDef>Titre</th>
+            <td mat-cell *matCellDef="let l">
+              <strong>{{ l.titre }}</strong>
+              @if (l.isbn) { <span class="muted isbn">{{ l.isbn }}</span> }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="auteurs">
+            <th mat-header-cell *matHeaderCellDef>Auteur(s)</th>
+            <td mat-cell *matCellDef="let l">{{ nomsAuteurs(l) }}</td>
+          </ng-container>
+          <ng-container matColumnDef="categorie">
+            <th mat-header-cell *matHeaderCellDef>Catégorie</th>
+            <td mat-cell *matCellDef="let l">{{ l.categorie || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="stock">
+            <th mat-header-cell *matHeaderCellDef>Stock</th>
+            <td mat-cell *matCellDef="let l">
+              <span class="chip" [class]="l.disponible ? 'chip-success' : 'chip-danger'">
+                {{ l.stockDisponible }} / {{ l.stockTotal }}
+              </span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let l" class="actions-cell">
+              <button mat-icon-button (click)="ouvrir(l)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button color="warn" (click)="supprimer(l)"><mat-icon>delete</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
+        </table>
+      </div>
+    </mat-card>
+  }
+</div>

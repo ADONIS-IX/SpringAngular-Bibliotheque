@@ -1,0 +1,55 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Catalogue</h1>
+  </div>
+
+  <div class="toolbar-row">
+    <mat-form-field appearance="outline" class="search">
+      <mat-label>Rechercher (titre, auteur, catégorie)</mat-label>
+      <input matInput [(ngModel)]="recherche" (keyup.enter)="charger()" />
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    <button mat-flat-button color="primary" (click)="charger()">Rechercher</button>
+
+    <mat-button-toggle-group [value]="filtre()" (change)="filtre.set($event.value)" hideSingleSelectionIndicator>
+      <mat-button-toggle value="tous">Tous</mat-button-toggle>
+      <mat-button-toggle value="disponibles">Disponibles</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
+
+  @if (loading()) {
+    <div class="empty-state"><mat-spinner diameter="40" /></div>
+  } @else if (livresAffiches().length === 0) {
+    <div class="empty-state">
+      <mat-icon>search_off</mat-icon>
+      <p>Aucun livre trouvé</p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (livre of livresAffiches(); track livre.id) {
+        <mat-card class="livre-card" [routerLink]="['/catalogue', livre.id]">
+          <mat-card-content>
+            <div class="livre-top">
+              <mat-icon class="livre-cover">menu_book</mat-icon>
+              @if (livre.disponible) {
+                <span class="chip chip-success">{{ livre.stockDisponible }} dispo</span>
+              } @else {
+                <span class="chip chip-danger">Épuisé</span>
+              }
+            </div>
+            <h3 class="livre-titre">{{ livre.titre }}</h3>
+            <p class="livre-auteurs muted">
+              {{ livre.auteurs.length ? auteurs(livre) : 'Auteur inconnu' }}
+            </p>
+            <div class="livre-meta">
+              @if (livre.categorie) { <span class="chip chip-neutral">{{ livre.categorie }}</span> }
+              @if (!livre.disponible && livre.fileAttente > 0) {
+                <span class="chip chip-warn">{{ livre.fileAttente }} en file</span>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

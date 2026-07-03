@@ -1,0 +1,119 @@
+/* ── Tuiles de statistiques ─────────────────────────────────── */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+}
+.tile-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.tile-icon mat-icon { color: #fff; }
+.tile-value { font: var(--mat-sys-headline-medium); line-height: 1.1; }
+.tile-label { font-size: 13px; color: var(--mat-sys-on-surface-variant); }
+
+.accent-blue  .tile-icon { background: #1565c0; }
+.accent-green .tile-icon { background: #2e7d32; }
+.accent-amber .tile-icon { background: #ef6c00; }
+.accent-red   .tile-icon { background: #c62828; }
+
+/* ── Zone graphiques ────────────────────────────────────────── */
+.charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+.chart-card { padding: 20px; }
+.chart-card.wide { grid-column: 1 / -1; }
+.chart-card h2 { margin: 0 0 20px; font: var(--mat-sys-title-medium); }
+@media (max-width: 900px) {
+  .charts { grid-template-columns: 1fr; }
+}
+
+/* Histogramme mensuel : barres fines, base ancrée, sommet arrondi 4px, teinte unique */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  height: 200px;
+  padding-top: 16px;
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  min-width: 0;
+}
+.bar-value { font-size: 11px; color: var(--mat-sys-on-surface-variant); height: 14px; }
+.bar {
+  width: 60%;
+  min-width: 10px;
+  min-height: 2px;
+  background: var(--mat-sys-primary);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+}
+.bar-label {
+  font-size: 10px;
+  color: var(--mat-sys-on-surface-variant);
+  margin-top: 6px;
+  white-space: nowrap;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  height: 28px;
+}
+
+/* Répartition par statut : couleur RESERVÉE + libellé texte */
+.statut-list { display: flex; flex-direction: column; gap: 16px; }
+.statut-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.statut-name { font-size: 14px; font-weight: 500; }
+.statut-count { font-size: 13px; color: var(--mat-sys-on-surface-variant); }
+.spacer { flex: 1 1 auto; }
+.dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.statut-track {
+  height: 10px;
+  background: var(--mat-sys-surface-variant);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.statut-fill { height: 100%; border-radius: 5px; transition: width 0.3s ease; }
+
+.st-cours  { background: #2e7d32; }
+.st-rendu  { background: #1565c0; }
+.st-retard { background: #c62828; }
+.dot.st-cours  { background: #2e7d32; }
+.dot.st-rendu  { background: #1565c0; }
+.dot.st-retard { background: #c62828; }
+
+/* Top livres : barres horizontales, teinte unique, étiquetées */
+.top-list { display: flex; flex-direction: column; gap: 12px; }
+.top-row { display: flex; align-items: center; gap: 12px; }
+.top-rank {
+  width: 24px; height: 24px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  border-radius: 50%; font-size: 13px; font-weight: 600;
+}
+.top-titre { flex: 0 0 200px; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top-track { flex: 1; height: 14px; background: var(--mat-sys-surface-variant); border-radius: 7px; overflow: hidden; }
+.top-fill { height: 100%; background: var(--mat-sys-primary); border-radius: 7px; transition: width 0.3s ease; }
+.top-count { width: 32px; text-align: right; font-weight: 600; font-size: 14px; }
+@media (max-width: 600px) {
+  .top-titre { flex-basis: 120px; }
+}

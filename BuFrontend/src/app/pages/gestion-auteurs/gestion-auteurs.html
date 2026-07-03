@@ -1,0 +1,40 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Gérer les auteurs</h1>
+    <button mat-flat-button color="primary" (click)="ouvrir()">
+      <mat-icon>add</mat-icon> Nouvel auteur
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="empty-state"><mat-spinner diameter="40" /></div>
+  } @else {
+    <mat-card>
+      <div class="table-scroll">
+        <table mat-table [dataSource]="auteurs()" class="full-width">
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef>Nom</th>
+            <td mat-cell *matCellDef="let a">{{ a.prenom }} {{ a.nom }}</td>
+          </ng-container>
+          <ng-container matColumnDef="nationalite">
+            <th mat-header-cell *matHeaderCellDef>Nationalité</th>
+            <td mat-cell *matCellDef="let a">{{ a.nationalite || '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="livres">
+            <th mat-header-cell *matHeaderCellDef>Livres</th>
+            <td mat-cell *matCellDef="let a">{{ a.nombreLivres }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let a" class="actions-cell">
+              <button mat-icon-button (click)="ouvrir(a)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button color="warn" (click)="supprimer(a)"><mat-icon>delete</mat-icon></button>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
+        </table>
+      </div>
+    </mat-card>
+  }
+</div>

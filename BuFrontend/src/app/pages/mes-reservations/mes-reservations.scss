@@ -1,0 +1,15 @@
+.cards { display: flex; flex-direction: column; gap: 12px; }
+
+.resa-card .ligne-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.resa-card h3 { margin: 0; font: var(--mat-sys-title-medium); }
+.spacer { flex: 1 1 auto; }
+.details { font-size: 13px; margin: 8px 0; }
+.actions { display: flex; gap: 8px; margin-top: 4px; }
+
+.highlight {
+  border: 2px solid var(--mat-sys-primary);
+}

@@ -1,1 +1,105 @@
-/* You can add global styles to this file, and also import other style files */
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$blue-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+  height: 100%;
+}
+/* ── Styles utilitaires de l'application ─────────────────────── */
+* { box-sizing: border-box; }
+
+.page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  margin: 0;
+  font: var(--mat-sys-headline-small);
+}
+
+.spacer { flex: 1 1 auto; }
+
+.row-actions { display: flex; gap: 8px; align-items: center; }
+
+.muted { color: var(--mat-sys-on-surface-variant); }
+
+.table-scroll { overflow-x: auto; width: 100%; }
+table.full-width { width: 100%; }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--mat-sys-on-surface-variant);
+}
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  opacity: 0.5;
+}
+
+/* Chips de statut colorés */
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip-success { background: #d7f5dd; color: #0f7a34; }
+.chip-warn    { background: #fff2cc; color: #8a6d00; }
+.chip-danger  { background: #fdd8d8; color: #a3160b; }
+.chip-info    { background: #d9ecff; color: #0a4d8c; }
+.chip-neutral { background: #e6e6e6; color: #555; }
+
+@media (prefers-color-scheme: dark) {
+  .chip-success { background: #123d20; color: #7ee29a; }
+  .chip-warn    { background: #3d3200; color: #ffd95e; }
+  .chip-danger  { background: #45140f; color: #ff9a8f; }
+  .chip-info    { background: #0d2a44; color: #8fc4ff; }
+  .chip-neutral { background: #333; color: #ccc; }
+}
+

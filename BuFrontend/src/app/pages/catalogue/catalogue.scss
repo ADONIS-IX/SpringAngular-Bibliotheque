@@ -1,0 +1,51 @@
+.toolbar-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.search { flex: 1 1 320px; }
+.search .mat-mdc-form-field-subscript-wrapper { display: none; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.livre-card {
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.livre-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--mat-sys-level3);
+}
+
+.livre-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.livre-cover {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--mat-sys-primary);
+}
+.livre-titre {
+  margin: 4px 0;
+  font: var(--mat-sys-title-medium);
+  line-height: 1.25;
+}
+.livre-auteurs {
+  margin: 0 0 10px;
+  font-size: 13px;
+}
+.livre-meta {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}

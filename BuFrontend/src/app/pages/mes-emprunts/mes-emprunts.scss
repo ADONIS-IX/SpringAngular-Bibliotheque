@@ -1,0 +1,11 @@
+.cards { display: flex; flex-direction: column; gap: 12px; padding-top: 16px; }
+
+.emprunt-card .ligne-titre {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.emprunt-card h3 { margin: 0; font: var(--mat-sys-title-medium); }
+.spacer { flex: 1 1 auto; }
+.dates { font-size: 13px; margin: 8px 0; }
+.actions { margin-top: 4px; }

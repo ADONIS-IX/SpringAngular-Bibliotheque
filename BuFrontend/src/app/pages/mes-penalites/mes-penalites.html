@@ -1,0 +1,53 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Mes pénalités</h1>
+    @if (totalImpaye() > 0) {
+      <span class="chip chip-danger total">Total impayé : {{ totalImpaye() }} FCFA</span>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="empty-state"><mat-spinner diameter="40" /></div>
+  } @else if (penalites().length === 0) {
+    <div class="empty-state">
+      <mat-icon>sentiment_satisfied</mat-icon>
+      <p>Aucune pénalité. Continuez à rendre vos livres à temps !</p>
+    </div>
+  } @else {
+    <mat-card>
+      <div class="table-scroll">
+        <table mat-table [dataSource]="penalites()" class="full-width">
+          <ng-container matColumnDef="livre">
+            <th mat-header-cell *matHeaderCellDef>Livre</th>
+            <td mat-cell *matCellDef="let p">{{ p.livreTitre }}</td>
+          </ng-container>
+          <ng-container matColumnDef="joursRetard">
+            <th mat-header-cell *matHeaderCellDef>Jours de retard</th>
+            <td mat-cell *matCellDef="let p">{{ p.joursRetard }}</td>
+          </ng-container>
+          <ng-container matColumnDef="montant">
+            <th mat-header-cell *matHeaderCellDef>Montant</th>
+            <td mat-cell *matCellDef="let p">{{ p.montant }} FCFA</td>
+          </ng-container>
+          <ng-container matColumnDef="statut">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let p">
+              @if (p.statut === 'PAYEE') {
+                <span class="chip chip-success">Payée</span>
+              } @else {
+                <span class="chip chip-danger">Non payée</span>
+              }
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let p">{{ p.dateCreation | date:'dd/MM/yyyy' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
+        </table>
+      </div>
+    </mat-card>
+    <p class="muted note">Le règlement des pénalités s'effectue au guichet de la bibliothèque.</p>
+  }
+</div>

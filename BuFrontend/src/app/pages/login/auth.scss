@@ -1,0 +1,55 @@
+.auth-wrap {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: linear-gradient(135deg,
+    var(--mat-sys-primary-container) 0%,
+    var(--mat-sys-surface) 60%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.auth-brand {
+  text-align: center;
+  margin: 16px 0 24px;
+}
+.auth-brand mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--mat-sys-primary);
+}
+.auth-brand h1 {
+  font: var(--mat-sys-headline-small);
+  margin: 8px 0 4px;
+}
+
+.full { width: 100%; }
+button.full { margin-top: 4px; height: 44px; }
+
+.auth-switch {
+  text-align: center;
+  margin: 16px 0 8px;
+  font-size: 14px;
+}
+
+.demo-box {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  text-align: center;
+  font-size: 13px;
+}
+.demo-chips {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
