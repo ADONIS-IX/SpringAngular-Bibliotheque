@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Auteur, AuteurRequest, Dashboard, Emprunt, Livre, LivreRequest,
-  Notification, Penalite, Reservation, CreateUserRequest, Utilisateur,
+  Notification, Penalite, Reservation, CreateUserRequest, UpdateUserRequest, Utilisateur,
 } from './models';
 
 @Injectable({ providedIn: 'root' })
@@ -74,6 +74,18 @@ export class AdminService {
   private http = inject(HttpClient);
   creerUtilisateur(req: CreateUserRequest): Observable<Utilisateur> {
     return this.http.post<Utilisateur>('/api/admin/users', req);
+  }
+
+  listerUtilisateurs(): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>('/api/admin/users');
+  }
+
+  modifierUtilisateur(id: number, req: UpdateUserRequest): Observable<Utilisateur> {
+    return this.http.put<Utilisateur>(`/api/admin/users/${id}`, req);
+  }
+
+  supprimerUtilisateur(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/admin/users/${id}`);
   }
 }
 

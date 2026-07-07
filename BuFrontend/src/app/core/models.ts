@@ -9,6 +9,14 @@ export interface CreateUserRequest {
   role: Role;
 }
 
+export interface UpdateUserRequest {
+  nom: string;
+  email?: string;
+  password?: string;
+  role: Role;
+  actif: boolean;
+}
+
 export interface AuthResponse {
   token: string;
   type: string;

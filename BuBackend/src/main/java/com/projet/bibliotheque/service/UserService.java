@@ -53,6 +53,9 @@ public class UserService implements UserDetailsService {
         if (utilisateurRepository.existsByEmail(email)) {
             throw new ConflictException("Email déjà utilisé : " + email);
         }
+        if (role != null && role.equalsIgnoreCase("ADMIN")) {
+            throw new ConflictException("Impossible de créer un utilisateur avec le rôle ADMIN.");
+        }
         Utilisateur u = new Utilisateur();
         u.setNom(nom);
         u.setEmail(email);
@@ -69,9 +72,27 @@ public class UserService implements UserDetailsService {
     public Utilisateur updateUser(Long id, UpdateUserRequest req) {
         Utilisateur u = utilisateurRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + id));
-        if (req.nom() != null && !req.nom().isBlank()) u.setNom(req.nom());
-        if (req.role() != null) u.setRole(Utilisateur.Role.valueOf(req.role().toUpperCase()));
-        if (req.actif() != null) u.setActif(req.actif());
+        if (req.nom() != null && !req.nom().isBlank()) {
+            u.setNom(req.nom());
+        }
+        if (req.email() != null && !req.email().isBlank() && !req.email().equalsIgnoreCase(u.getEmail())) {
+            if (utilisateurRepository.existsByEmail(req.email())) {
+                throw new ConflictException("Email déjà utilisé : " + req.email());
+            }
+            u.setEmail(req.email());
+        }
+        if (req.password() != null && !req.password().isBlank()) {
+            u.setMotDePasse(passwordEncoder.encode(req.password()));
+        }
+        if (req.role() != null) {
+            if (req.role().equalsIgnoreCase("ADMIN") && !u.getRole().name().equalsIgnoreCase("ADMIN")) {
+                throw new ConflictException("Impossible d'assigner le rôle ADMIN.");
+            }
+            u.setRole(Utilisateur.Role.valueOf(req.role().toUpperCase()));
+        }
+        if (req.actif() != null) {
+            u.setActif(req.actif());
+        }
         return utilisateurRepository.save(u);
     }
 
