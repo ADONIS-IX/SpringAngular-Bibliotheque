@@ -1,54 +1,68 @@
-@if (isLoggedIn()) {
-  <mat-toolbar color="primary" class="app-toolbar">
-    <button mat-icon-button (click)="toggle()" aria-label="Menu">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <mat-icon class="brand-icon">local_library</mat-icon>
-    <span class="brand">Bibliothèque Universitaire</span>
-    <span class="spacer"></span>
-
-    <app-notification-bell />
-
-    <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
-      <mat-icon>account_circle</mat-icon>
-      <span class="user-name">{{ user()?.nom }}</span>
-    </button>
-    <mat-menu #userMenu="matMenu">
-      <div class="user-info" (click)="$event.stopPropagation()">
-        <div class="user-info-name">{{ user()?.nom }}</div>
-        <div class="user-info-email">{{ user()?.email }}</div>
-        <div class="user-info-role">{{ user()?.role }}</div>
-      </div>
-      <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Se déconnecter</span>
-      </button>
-    </mat-menu>
-  </mat-toolbar>
-
-  <mat-sidenav-container class="app-container">
-    <mat-sidenav [opened]="opened()" mode="side" class="app-sidenav">
-      <mat-nav-list>
-        @for (link of navLinks(); track link.path) {
-          <a mat-list-item [routerLink]="link.path" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
-            <span matListItemTitle>{{ link.label }}</span>
-          </a>
-        }
-      </mat-nav-list>
-    </mat-sidenav>
-
-    <mat-sidenav-content class="app-content">
-      <router-outlet />
-    </mat-sidenav-content>
-  </mat-sidenav-container>
-} @else {
-  <mat-toolbar color="primary" class="app-toolbar">
-    <mat-icon class="brand-icon">local_library</mat-icon>
-    <span class="brand">Bibliothèque Universitaire</span>
-    <span class="spacer"></span>
-    <button mat-flat-button color="accent" routerLink="/login">Se connecter</button>
-  </mat-toolbar>
-
+@if (isLoginPage()) {
+  <!-- Page de login : aucun élément de navigation -->
   <router-outlet />
+} @else {
+  <!-- Page normale (connecté ou non) -->
+  @if (isLoggedIn()) {
+    <mat-toolbar color="primary" class="app-toolbar">
+      <button mat-icon-button (click)="toggle()" aria-label="Menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <mat-icon class="brand-icon">local_library</mat-icon>
+      <span class="brand">Bibliothèque Universitaire</span>
+      <span class="spacer"></span>
+
+      <app-notification-bell />
+
+      <button mat-button [matMenuTriggerFor]="userMenu" class="user-btn">
+        <mat-icon>account_circle</mat-icon>
+        <span class="user-name">{{ user()?.nom }}</span>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div class="user-info" (click)="$event.stopPropagation()">
+          <div class="user-info-name">{{ user()?.nom }}</div>
+          <div class="user-info-email">{{ user()?.email }}</div>
+          <div class="user-info-role">{{ user()?.role }}</div>
+        </div>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Se déconnecter</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <mat-sidenav-container class="app-container">
+      <mat-sidenav [opened]="opened()" mode="side" class="app-sidenav">
+        <mat-nav-list>
+          @for (link of navLinks(); track link.path) {
+            <a
+              mat-list-item
+              [routerLink]="link.path"
+              routerLinkActive="active-link"
+            >
+              <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+              <span matListItemTitle>{{ link.label }}</span>
+            </a>
+          }
+        </mat-nav-list>
+      </mat-sidenav>
+
+      <mat-sidenav-content class="app-content">
+        <router-outlet />
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+
+  } @else {
+    <!-- Utilisateur non connecté (hors login) : toolbar simplifiée -->
+    <mat-toolbar color="primary" class="app-toolbar">
+      <mat-icon class="brand-icon">local_library</mat-icon>
+      <span class="brand">Bibliothèque Universitaire</span>
+      <span class="spacer"></span>
+      <button mat-flat-button color="accent" routerLink="/login">
+        Se connecter
+      </button>
+    </mat-toolbar>
+
+    <router-outlet />
+  }
 }
