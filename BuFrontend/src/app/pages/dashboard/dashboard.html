@@ -6,46 +6,47 @@
     </button>
   </div>
 
-  @if (loading()) {
-    <div class="empty-state"><mat-spinner diameter="40" /></div>
-  } @else if (data(); as d) {
-    <!-- Tuiles de statistiques -->
-    <div class="tiles">
-      @for (t of tiles(); track t.label) {
-        <mat-card class="tile" [class]="'accent-' + t.accent">
+  <ng-container *ngIf="loading(); else dataBlock">
+    <div class="empty-state"><mat-spinner diameter="40"></mat-spinner></div>
+  </ng-container>
+
+  <ng-template #dataBlock>
+    <ng-container *ngIf="data() as d">
+      <!-- Tuiles de statistiques -->
+      <div class="tiles">
+        <mat-card class="tile" *ngFor="let t of tiles()" [class]="'accent-' + t.accent">
           <div class="tile-icon"><mat-icon>{{ t.icon }}</mat-icon></div>
           <div class="tile-body">
             <div class="tile-value">{{ t.valeur }}</div>
             <div class="tile-label">{{ t.label }}</div>
           </div>
         </mat-card>
-      }
-    </div>
+      </div>
 
-    <div class="charts">
-      <!-- Emprunts par mois -->
-      <mat-card class="chart-card">
-        <h2>Emprunts par mois (12 derniers mois)</h2>
-        <div class="bar-chart">
-          @for (m of d.empruntsParMois; track m.mois) {
-            <div class="bar-col" [title]="m.mois + ' : ' + m.nombre + ' emprunt(s)'">
-              <div class="bar-value">{{ m.nombre || '' }}</div>
-              <div class="bar" [style.height.%]="hauteurMois(m.nombre)"></div>
-              <div class="bar-label">{{ m.mois }}</div>
+      <div class="charts">
+        <ng-container *ngIf="!d || (!d.empruntsParMois?.length && !d.topLivres?.length && !d.repartitionStatuts?.length)">
+          <div class="empty-state"><p>Aucune donnée disponible pour le tableau de bord.</p></div>
+        </ng-container>
+
+        <ng-container *ngIf="d">
+          <!-- Emprunts par mois -->
+          <mat-card class="chart-card">
+            <h2>Emprunts par mois (12 derniers mois)</h2>
+            <div class="bar-chart">
+              <div class="bar-col" *ngFor="let m of d.empruntsParMois">
+                <div class="bar-value">{{ m.nombre || '' }}</div>
+                <div class="bar" [style.height.%]="hauteurMois(m.nombre)"></div>
+                <div class="bar-label">{{ m.mois }}</div>
+              </div>
             </div>
-          }
-        </div>
-      </mat-card>
+          </mat-card>
 
-      <!-- Répartition par statut : couleur + libellé (jamais couleur seule) -->
-      <mat-card class="chart-card">
-        <h2>Répartition des emprunts</h2>
-        @if (totalStatuts() === 0) {
-          <p class="muted">Aucun emprunt enregistré.</p>
-        } @else {
-          <div class="statut-list">
-            @for (s of d.repartitionStatuts; track s.statut) {
-              <div class="statut-row">
+          <!-- Répartition par statut -->
+          <mat-card class="chart-card">
+            <h2>Répartition des emprunts</h2>
+            <p class="muted" *ngIf="totalStatuts() === 0">Aucun emprunt enregistré.</p>
+            <div class="statut-list" *ngIf="totalStatuts() !== 0">
+              <div class="statut-row" *ngFor="let s of d.repartitionStatuts">
                 <div class="statut-head">
                   <span class="dot" [class]="statutClasse(s.statut)"></span>
                   <span class="statut-name">{{ statutLabel(s.statut) }}</span>
@@ -57,20 +58,15 @@
                        [style.width.%]="pourcentageStatut(s.nombre)"></div>
                 </div>
               </div>
-            }
-          </div>
-        }
-      </mat-card>
+            </div>
+          </mat-card>
 
-      <!-- Top 5 des livres -->
-      <mat-card class="chart-card wide">
-        <h2>Top 5 des livres les plus empruntés</h2>
-        @if (d.topLivres.length === 0) {
-          <p class="muted">Pas encore de données.</p>
-        } @else {
-          <div class="top-list">
-            @for (l of d.topLivres; track l.livreId; let i = $index) {
-              <div class="top-row">
+          <!-- Top 5 des livres -->
+          <mat-card class="chart-card wide">
+            <h2>Top 5 des livres les plus empruntés</h2>
+            <p class="muted" *ngIf="!(d.topLivres?.length)">Pas encore de données.</p>
+            <div class="top-list" *ngIf="d.topLivres?.length">
+              <div class="top-row" *ngFor="let l of d.topLivres; let i = index">
                 <span class="top-rank">{{ i + 1 }}</span>
                 <span class="top-titre">{{ l.titre }}</span>
                 <div class="top-track">
@@ -78,10 +74,10 @@
                 </div>
                 <span class="top-count">{{ l.nombreEmprunts }}</span>
               </div>
-            }
-          </div>
-        }
-      </mat-card>
-    </div>
-  }
+            </div>
+          </mat-card>
+        </ng-container>
+      </div>
+    </ng-container>
+  </ng-template>
 </div>

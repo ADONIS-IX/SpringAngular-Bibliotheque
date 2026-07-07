@@ -43,5 +43,12 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
 } @else {
+  <mat-toolbar color="primary" class="app-toolbar">
+    <mat-icon class="brand-icon">local_library</mat-icon>
+    <span class="brand">Bibliothèque Universitaire</span>
+    <span class="spacer"></span>
+    <button mat-flat-button color="accent" routerLink="/login">Se connecter</button>
+  </mat-toolbar>
+
   <router-outlet />
 }

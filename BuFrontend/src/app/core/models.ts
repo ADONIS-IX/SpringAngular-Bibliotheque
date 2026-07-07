@@ -2,6 +2,13 @@
 
 export type Role = 'ETUDIANT' | 'BIBLIOTHECAIRE' | 'ADMIN';
 
+export interface CreateUserRequest {
+  nom: string;
+  email: string;
+  password: string;
+  role: Role;
+}
+
 export interface AuthResponse {
   token: string;
   type: string;

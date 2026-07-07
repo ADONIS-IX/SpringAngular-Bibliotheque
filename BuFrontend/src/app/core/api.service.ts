@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Auteur, AuteurRequest, Dashboard, Emprunt, Livre, LivreRequest,
-  Notification, Penalite, Reservation,
+  Notification, Penalite, Reservation, CreateUserRequest, Utilisateur,
 } from './models';
 
 @Injectable({ providedIn: 'root' })
@@ -70,6 +70,13 @@ export class NotificationService {
 }
 
 @Injectable({ providedIn: 'root' })
+export class AdminService {
+  private http = inject(HttpClient);
+  creerUtilisateur(req: CreateUserRequest): Observable<Utilisateur> {
+    return this.http.post<Utilisateur>('/api/admin/users', req);
+  }
+}
+
 export class StatsService {
   private http = inject(HttpClient);
   dashboard(): Observable<Dashboard> { return this.http.get<Dashboard>('/api/stats/dashboard'); }

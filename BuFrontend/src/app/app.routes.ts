@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { authGuard, bibliothecaireGuard } from './core/guards';
+import { adminGuard, authGuard, bibliothecaireGuard } from './core/guards';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'catalogue' },
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
 
   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
   { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.Register) },
@@ -22,6 +22,7 @@ export const routes: Routes = [
   { path: 'gestion-auteurs', canActivate: [bibliothecaireGuard], loadComponent: () => import('./pages/gestion-auteurs/gestion-auteurs').then(m => m.GestionAuteurs) },
   { path: 'gestion-emprunts', canActivate: [bibliothecaireGuard], loadComponent: () => import('./pages/gestion-emprunts/gestion-emprunts').then(m => m.GestionEmprunts) },
   { path: 'gestion-penalites', canActivate: [bibliothecaireGuard], loadComponent: () => import('./pages/gestion-penalites/gestion-penalites').then(m => m.GestionPenalites) },
+  { path: 'gestion-utilisateurs', canActivate: [adminGuard], loadComponent: () => import('./pages/gestion-utilisateurs/gestion-utilisateurs').then(m => m.GestionUtilisateurs) },
 
   { path: '**', redirectTo: 'catalogue' },
 ];

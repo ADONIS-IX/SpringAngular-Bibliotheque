@@ -9,7 +9,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './core/auth.service';
 import { NotificationBell } from './shared/notification-bell';
 
-interface NavLink { path: string; label: string; icon: string; biblio?: boolean; }
+interface NavLink { path: string; label: string; icon: string; auth?: boolean; etudiant?: boolean; biblio?: boolean; admin?: boolean; public?: boolean; }
 
 @Component({
   selector: 'app-root',
@@ -28,21 +28,37 @@ export class App {
   readonly user = this.auth.user;
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly isBiblio = this.auth.isBibliothecaire;
+  readonly isAdmin = this.auth.isAdmin;
   opened = signal(true);
 
   private readonly liens: NavLink[] = [
-    { path: '/catalogue', label: 'Catalogue', icon: 'menu_book' },
-    { path: '/mes-emprunts', label: 'Mes emprunts', icon: 'import_contacts' },
-    { path: '/mes-reservations', label: 'Mes réservations', icon: 'bookmark' },
-    { path: '/mes-penalites', label: 'Mes pénalités', icon: 'payments' },
-    { path: '/dashboard', label: 'Tableau de bord', icon: 'dashboard', biblio: true },
-    { path: '/gestion-livres', label: 'Gérer les livres', icon: 'library_books', biblio: true },
-    { path: '/gestion-auteurs', label: 'Gérer les auteurs', icon: 'people', biblio: true },
-    { path: '/gestion-emprunts', label: 'Emprunts & retours', icon: 'assignment_return', biblio: true },
-    { path: '/gestion-penalites', label: 'Pénalités', icon: 'account_balance_wallet', biblio: true },
+    { path: '/catalogue', label: 'Catalogue', icon: 'menu_book', public: true },
+    { path: '/mes-emprunts', label: 'Mes emprunts', icon: 'import_contacts', auth: true, etudiant: true },
+    { path: '/mes-reservations', label: 'Mes réservations', icon: 'bookmark', auth: true, etudiant: true },
+    { path: '/mes-penalites', label: 'Mes pénalités', icon: 'payments', auth: true, etudiant: true },
+    { path: '/dashboard', label: 'Tableau de bord', icon: 'dashboard', auth: true, biblio: true },
+    { path: '/gestion-livres', label: 'Gérer les livres', icon: 'library_books', auth: true, biblio: true },
+    { path: '/gestion-auteurs', label: 'Gérer les auteurs', icon: 'people', auth: true, biblio: true },
+    { path: '/gestion-emprunts', label: 'Emprunts & retours', icon: 'assignment_return', auth: true, biblio: true },
+    { path: '/gestion-penalites', label: 'Pénalités', icon: 'account_balance_wallet', auth: true, biblio: true },
+    { path: '/gestion-utilisateurs', label: 'Gérer les utilisateurs', icon: 'manage_accounts', auth: true, admin: true },
   ];
 
-  readonly navLinks = computed(() => this.liens.filter(l => !l.biblio || this.isBiblio()));
+  readonly navLinks = computed(() => this.liens.filter(link => {
+    if (link.public) {
+      return true;
+    }
+    if (link.admin) {
+      return this.isAdmin();
+    }
+    if (link.biblio) {
+      return this.isBiblio();
+    }
+    if (link.etudiant) {
+      return this.isLoggedIn() && !this.isBiblio();
+    }
+    return link.auth ? this.isLoggedIn() : true;
+  }));
 
   toggle(): void {
     this.opened.update(v => !v);
