@@ -2,8 +2,6 @@ import { Component, computed, inject, signal, OnInit } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -19,6 +17,7 @@ interface NavLink {
   biblio?: boolean;
   admin?: boolean;
   public?: boolean;
+  children?: NavLink[];
 }
 
 @Component({
@@ -28,8 +27,6 @@ interface NavLink {
     RouterLink,
     RouterLinkActive,
     MatToolbarModule,
-    MatSidenavModule,
-    MatListModule,
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
@@ -46,44 +43,48 @@ export class App implements OnInit {
   readonly isLoggedIn = this.auth.isLoggedIn;
   readonly isBiblio = this.auth.isBibliothecaire;
   readonly isAdmin = this.auth.isAdmin;
-  opened = signal(true);
 
-  // Initialisation avec window.location.pathname (plus fiable au premier rendu)
+  // Sidebar réduit au démarrage
+  opened = signal(false);
+  isHovered = signal(false);
+
+  private submenusState = signal<Record<string, boolean>>({});
+
   isLoginPage = signal(window.location.pathname === '/login');
 
   private readonly liens: NavLink[] = [
-    { path: '/catalogue', label: 'Catalogue', icon: 'menu_book', public: true },
-    { path: '/mes-emprunts', label: 'Mes emprunts', icon: 'import_contacts', auth: true, etudiant: true },
-    { path: '/mes-reservations', label: 'Mes réservations', icon: 'bookmark', auth: true, etudiant: true },
-    { path: '/mes-penalites', label: 'Mes pénalités', icon: 'payments', auth: true, etudiant: true },
-    { path: '/dashboard', label: 'Tableau de bord', icon: 'dashboard', auth: true, biblio: true },
-    { path: '/gestion-livres', label: 'Gérer les livres', icon: 'library_books', auth: true, biblio: true },
-    { path: '/gestion-auteurs', label: 'Gérer les auteurs', icon: 'people', auth: true, biblio: true },
-    { path: '/gestion-emprunts', label: 'Emprunts & retours', icon: 'assignment_return', auth: true, biblio: true },
-    { path: '/gestion-penalites', label: 'Pénalités', icon: 'account_balance_wallet', auth: true, biblio: true },
-    { path: '/gestion-utilisateurs', label: 'Gérer les utilisateurs', icon: 'manage_accounts', auth: true, admin: true },
+    { path: '/catalogue', label: 'Catalogue', icon: 'bx-book', public: true },
+    { path: '/mes-emprunts', label: 'Mes emprunts', icon: 'bx-import', auth: true, etudiant: true },
+    { path: '/mes-reservations', label: 'Mes réservations', icon: 'bx-bookmark', auth: true, etudiant: true },
+    { path: '/mes-penalites', label: 'Mes pénalités', icon: 'bx-money', auth: true, etudiant: true },
+    {
+      path: '/gestion',
+      label: 'Gestion',
+      icon: 'bx-cog',
+      auth: true,
+      biblio: true,
+      children: [
+        { path: '/gestion-livres', label: 'Livres', icon: 'bx-book' },
+        { path: '/gestion-auteurs', label: 'Auteurs', icon: 'bx-user' },
+        { path: '/gestion-emprunts', label: 'Emprunts & retours', icon: 'bx-return' },
+        { path: '/gestion-penalites', label: 'Pénalités', icon: 'bx-wallet' },
+      ],
+    },
+    { path: '/dashboard', label: 'Tableau de bord', icon: 'bx-dashboard', auth: true, biblio: true },
+    { path: '/gestion-utilisateurs', label: 'Gérer les utilisateurs', icon: 'bx-group', auth: true, admin: true },
   ];
 
   readonly navLinks = computed(() =>
     this.liens.filter((link) => {
-      if (link.public) {
-        return true;
-      }
-      if (link.admin) {
-        return this.isAdmin();
-      }
-      if (link.biblio) {
-        return this.isBiblio();
-      }
-      if (link.etudiant) {
-        return this.isLoggedIn() && !this.isBiblio();
-      }
+      if (link.public) return true;
+      if (link.admin) return this.isAdmin();
+      if (link.biblio) return this.isBiblio();
+      if (link.etudiant) return this.isLoggedIn() && !this.isBiblio();
       return link.auth ? this.isLoggedIn() : true;
     })
   );
 
   ngOnInit() {
-    // Mise à jour lors des changements de route (navigation)
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
@@ -91,8 +92,23 @@ export class App implements OnInit {
       });
   }
 
-  toggle(): void {
-    this.opened.update((v) => !v);
+  toggleSubmenu(path: string) {
+    this.submenusState.update((state) => ({
+      ...state,
+      [path]: !state[path],
+    }));
+  }
+
+  isSubmenuOpen(path: string): boolean {
+    return this.submenusState()[path] || false;
+  }
+
+  collapseSidebar() {
+    this.opened.set(false);
+  }
+
+  expandSidebar() {
+    this.opened.set(true);
   }
 
   logout(): void {
