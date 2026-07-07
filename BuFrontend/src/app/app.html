@@ -1,13 +1,8 @@
 @if (isLoginPage()) {
-  <!-- Page de login : aucun élément de navigation -->
   <router-outlet />
 } @else {
-  <!-- Page normale (connecté ou non) -->
   @if (isLoggedIn()) {
     <mat-toolbar color="primary" class="app-toolbar">
-      <button mat-icon-button (click)="toggle()" aria-label="Menu">
-        <mat-icon>menu</mat-icon>
-      </button>
       <mat-icon class="brand-icon">local_library</mat-icon>
       <span class="brand">Bibliothèque Universitaire</span>
       <span class="spacer"></span>
@@ -31,29 +26,75 @@
       </mat-menu>
     </mat-toolbar>
 
-    <mat-sidenav-container class="app-container">
-      <mat-sidenav [opened]="opened()" mode="side" class="app-sidenav">
-        <mat-nav-list>
+    <nav
+      class="sidebar"
+      [class.close]="!opened() && !isHovered()"
+      (mouseenter)="isHovered.set(true)"
+      (mouseleave)="isHovered.set(false)"
+    >
+      <div class="menu_content">
+        <ul class="menu_items">
+          <div class="menu_title menu_dashboard"></div>
           @for (link of navLinks(); track link.path) {
-            <a
-              mat-list-item
-              [routerLink]="link.path"
-              routerLinkActive="active-link"
-            >
-              <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
-              <span matListItemTitle>{{ link.label }}</span>
-            </a>
+            @if (link.children && link.children.length) {
+              <li class="item">
+                <div class="nav_link submenu_item" (click)="toggleSubmenu(link.path)">
+                  <span class="navlink_icon">
+                    <i class="bx {{ link.icon }}"></i>
+                  </span>
+                  <span class="navlink">{{ link.label }}</span>
+                  <i
+                    class="bx bx-chevron-right arrow-left"
+                    [class.rotated]="isSubmenuOpen(link.path)"
+                  ></i>
+                </div>
+                <ul class="menu_items submenu" [class.show_submenu]="isSubmenuOpen(link.path)">
+                  @for (child of link.children; track child.path) {
+                    <a
+                      class="nav_link sublink"
+                      [routerLink]="child.path"
+                      routerLinkActive="active-link"
+                    >
+                      <span class="navlink_icon"><i class="bx {{ child.icon }}"></i></span>
+                      <span class="navlink">{{ child.label }}</span>
+                    </a>
+                  }
+                </ul>
+              </li>
+            } @else {
+              <li class="item">
+                <a class="nav_link" [routerLink]="link.path" routerLinkActive="active-link">
+                  <span class="navlink_icon">
+                    <i class="bx {{ link.icon }}"></i>
+                  </span>
+                  <span class="navlink">{{ link.label }}</span>
+                </a>
+              </li>
+            }
           }
-        </mat-nav-list>
-      </mat-sidenav>
+        </ul>
 
-      <mat-sidenav-content class="app-content">
-        <router-outlet />
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+        <div class="bottom_content">
+          @if (opened()) {
+            <div class="bottom" (click)="collapseSidebar()">
+              <span>Collapse</span>
+              <i class="bx bx-log-out"></i>
+            </div>
+          } @else {
+            <div class="bottom" (click)="expandSidebar()">
+              <span>Expand</span>
+              <i class="bx bx-log-in"></i>
+            </div>
+          }
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content" [class.sidebar-closed]="!opened() && !isHovered()">
+      <router-outlet />
+    </div>
 
   } @else {
-    <!-- Utilisateur non connecté (hors login) : toolbar simplifiée -->
     <mat-toolbar color="primary" class="app-toolbar">
       <mat-icon class="brand-icon">local_library</mat-icon>
       <span class="brand">Bibliothèque Universitaire</span>
