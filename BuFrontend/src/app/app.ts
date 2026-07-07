@@ -1,5 +1,6 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -9,19 +10,35 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AuthService } from './core/auth.service';
 import { NotificationBell } from './shared/notification-bell';
 
-interface NavLink { path: string; label: string; icon: string; auth?: boolean; etudiant?: boolean; biblio?: boolean; admin?: boolean; public?: boolean; }
+interface NavLink {
+  path: string;
+  label: string;
+  icon: string;
+  auth?: boolean;
+  etudiant?: boolean;
+  biblio?: boolean;
+  admin?: boolean;
+  public?: boolean;
+}
 
 @Component({
   selector: 'app-root',
   imports: [
-    RouterOutlet, RouterLink, RouterLinkActive,
-    MatToolbarModule, MatSidenavModule, MatListModule, MatIconModule,
-    MatButtonModule, MatMenuModule, NotificationBell,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    NotificationBell,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {
+export class App implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
 
@@ -30,6 +47,9 @@ export class App {
   readonly isBiblio = this.auth.isBibliothecaire;
   readonly isAdmin = this.auth.isAdmin;
   opened = signal(true);
+
+  // Initialisation avec window.location.pathname (plus fiable au premier rendu)
+  isLoginPage = signal(window.location.pathname === '/login');
 
   private readonly liens: NavLink[] = [
     { path: '/catalogue', label: 'Catalogue', icon: 'menu_book', public: true },
@@ -44,24 +64,35 @@ export class App {
     { path: '/gestion-utilisateurs', label: 'Gérer les utilisateurs', icon: 'manage_accounts', auth: true, admin: true },
   ];
 
-  readonly navLinks = computed(() => this.liens.filter(link => {
-    if (link.public) {
-      return true;
-    }
-    if (link.admin) {
-      return this.isAdmin();
-    }
-    if (link.biblio) {
-      return this.isBiblio();
-    }
-    if (link.etudiant) {
-      return this.isLoggedIn() && !this.isBiblio();
-    }
-    return link.auth ? this.isLoggedIn() : true;
-  }));
+  readonly navLinks = computed(() =>
+    this.liens.filter((link) => {
+      if (link.public) {
+        return true;
+      }
+      if (link.admin) {
+        return this.isAdmin();
+      }
+      if (link.biblio) {
+        return this.isBiblio();
+      }
+      if (link.etudiant) {
+        return this.isLoggedIn() && !this.isBiblio();
+      }
+      return link.auth ? this.isLoggedIn() : true;
+    })
+  );
+
+  ngOnInit() {
+    // Mise à jour lors des changements de route (navigation)
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.isLoginPage.set(this.router.url === '/login');
+      });
+  }
 
   toggle(): void {
-    this.opened.update(v => !v);
+    this.opened.update((v) => !v);
   }
 
   logout(): void {
