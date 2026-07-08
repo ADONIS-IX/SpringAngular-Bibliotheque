@@ -1,0 +1,21 @@
+Backend — bugs de concurrence et de robustesse
+1. Race condition sur le dernier exemplaire (EmpruntService.emprunter / retourner) — aucun verrou optimiste (@Version) ni pessimiste sur Livre/Emprunt. Deux emprunts simultanés sur le dernier exemplaire disponible passent tous les deux la validation → sur-allocation. Idem pour deux retours simultanés du même emprunt → double libération de stock/promotion de réservation.
+2. Fuite d'infos sur erreur 500 — UserService.inscrire fait existsByEmail puis save de façon non atomique ; en cas de collision concurrente, la DataIntegrityViolationException n'est pas catchée par GlobalExceptionHandler et remonte en 500 avec e.getMessage() (détails JDBC/contrainte exposés au client).
+3. Validation des rôles trop laxiste — CreateUserRequest.role/UpdateUserRequest.role sont de simples String sans @Pattern, une valeur invalide provoque une IllegalArgumentException peu propre au lieu d'un 400 de validation classique.
+4. N+1 queries sur toutes les listes (LivreService.toDto, EmpruntService.toDto, ReservationService.calculerPosition) — une requête de comptage par ligne, pénalisant à l'échelle.
+5. Incohérence stock (mineur) — réduire stockTotal sous le nombre d'emprunts en cours clampe silencieusement stockDisponible à 0 sans avertissement.
+Point positif vérifié : les endpoits /mes-* et les actions par id sont bien protégés par comparaison propriétaire/@PreAuthorize — pas de faille d'accès horizontal (IDOR) trouvée.
+
+Frontend — auth et UX
+1. Formulaire de création de compte (gestion-utilisateurs/utilisateur-dialog.ts:142) — le mot de passe n'a que minLength(6), pas required : un admin peut créer un compte avec mot de passe vide côté client (rejeté seulement par le backend, en 400 générique).
+2. Guards trop génériques (core/guards.ts) — un utilisateur déjà connecté mais sans le bon rôle est renvoyé vers /login au lieu d'une page "accès refusé", ce qui est trompeur.
+3. Rôle client jamais rafraîchi (auth.service.ts) — le rôle est mis en cache à la connexion ; si un admin rétrograde un utilisateur connecté, son onglet garde l'UI admin/bibliothécaire jusqu'au prochain 403 API (pas de vraie faille, juste de l'hygiène UI).
+4. Pas de synchronisation multi-onglets du logout, pas de gestion du 403 dans l'intercepteur (seul le 401 est traité), pas de décodage exp du JWT — l'expiration n'est détectée que réactivement, au premier appel API en échec.
+5. Détails mineurs : confirm() natif incohérent avec le ConfirmDialog maison ; règles de mot de passe frontend plus faibles que les comptes de démo ne le suggèrent.
+
+Priorités suggérées
+1. Sortir les secrets du repo (rapide, critique si le dépôt devient public).
+2. Ajouter un verrou optimiste (@Version) sur Livre/Emprunt pour la concurrence emprunt/retour.
+3. Catcher DataIntegrityViolationException proprement dans GlobalExceptionHandler et arrêter d'exposer e.getMessage() sur les exceptions inconnues.
+4. Corriger le required manquant sur le mot de passe du dialog admin.
+5. Le reste (N+1, guards, 403 handling) est important mais non urgent.
