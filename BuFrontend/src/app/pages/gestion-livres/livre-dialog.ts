@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -9,10 +9,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Auteur, Livre, LivreRequest } from '../../core/models';
 import { Ui } from '../../core/ui';
+import { BrouillonService } from '../../core/brouillon.service';
 
 interface DialogData {
   livre: Livre | null;
   auteurs: Auteur[];
+  brouillon?: Partial<LivreRequest> | null;
 }
 
 const TAILLE_MAX_IMAGE = 2 * 1024 * 1024; // 2 Mo
@@ -120,35 +122,85 @@ const TAILLE_MAX_IMAGE = 2 * 1024 * 1024; // 2 Mo
 
     .dialog-head { padding: 24px 24px 4px; }
     .eyebrow {
-      margin: 0 0 4px; font-size: 11px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold);
+      margin: 0 0 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
     }
     h2[mat-dialog-title] {
-      margin: 0; font-family: 'Source Serif 4', Georgia, serif;
-      font-weight: 700; font-size: 21px; color: var(--ink);
+      margin: 0;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-weight: 700;
+      font-size: 21px;
+      color: var(--ink);
     }
 
-    .dialog-form { display: flex; flex-direction: column; min-width: 520px; padding-top: 12px; gap: 4px; }
+    .dialog-form {
+      display: flex;
+      flex-direction: column;
+      min-width: 520px;
+      padding-top: 12px;
+      gap: 4px;
+    }
     .full { width: 100%; }
     .row { display: flex; gap: 12px; }
     .row mat-form-field { flex: 1; }
 
-    .form-with-image { display: flex; gap: 20px; align-items: flex-start; }
+    .form-with-image {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
     .champs { flex: 1; min-width: 0; }
     .image-bloc {
-      width: 150px; display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0;
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
-    .image-label { font-size: 12px; color: var(--ink-soft); align-self: flex-start; }
+    .image-label {
+      font-size: 12px;
+      color: var(--ink-soft);
+      align-self: flex-start;
+    }
     .image-preview {
-      width: 130px; height: 170px; border-radius: 8px; border: 1px dashed var(--line);
-      background: #f4f5fb; display: flex; align-items: center; justify-content: center; overflow: hidden;
+      width: 130px;
+      height: 170px;
+      border-radius: 8px;
+      border: 1px dashed var(--line);
+      background: #f4f5fb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
-    .image-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .image-preview mat-icon { font-size: 38px; width: 38px; height: 38px; color: var(--indigo); opacity: .5; }
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-preview mat-icon {
+      font-size: 38px;
+      width: 38px;
+      height: 38px;
+      color: var(--indigo);
+      opacity: .5;
+    }
 
-    mat-dialog-actions { padding: 12px 24px 20px !important; }
-    .btn-ghost { color: var(--ink-soft) !important; }
-    .btn-primary { background: var(--indigo) !important; color: #fff !important; }
+    mat-dialog-actions {
+      padding: 12px 24px 20px !important;
+    }
+    .btn-ghost {
+      color: var(--ink-soft) !important;
+    }
+    .btn-primary {
+      background: var(--indigo) !important;
+      color: #fff !important;
+    }
 
     @media (max-width: 600px) {
       .dialog-form { min-width: 260px; }
@@ -157,24 +209,56 @@ const TAILLE_MAX_IMAGE = 2 * 1024 * 1024; // 2 Mo
     }
   `],
 })
-export class LivreDialog {
+export class LivreDialog implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private ref = inject(MatDialogRef<LivreDialog>);
   private ui = inject(Ui);
+  private brouillonService = inject(BrouillonService);
   data = inject<DialogData>(MAT_DIALOG_DATA);
+  private readonly CLE_BROUILLON = 'livre';
 
-  apercu = signal<string | null>(this.data.livre?.imageUrl ?? null);
+  apercu = signal<string | null>(this.data.livre?.imageUrl ?? this.data.brouillon?.imageUrl ?? null);
+  estModification = !!this.data.livre;
 
   form = this.fb.nonNullable.group({
-    titre: [this.data.livre?.titre ?? '', Validators.required],
-    isbn: [this.data.livre?.isbn ?? ''],
-    anneePublication: [this.data.livre?.anneePublication ?? null as number | null],
-    categorie: [this.data.livre?.categorie ?? ''],
-    stockTotal: [this.data.livre?.stockTotal ?? 1, [Validators.required, Validators.min(0)]],
-    auteurIds: [this.data.livre?.auteurs.map(a => a.id) ?? [] as number[],
-      [Validators.required, Validators.minLength(1)]],
-    description: [this.data.livre?.description ?? '' as string | null],
+    titre: [
+      this.data.brouillon?.titre ?? this.data.livre?.titre ?? '',
+      Validators.required,
+    ],
+    isbn: [this.data.brouillon?.isbn ?? this.data.livre?.isbn ?? ''],
+    anneePublication: [
+      this.data.brouillon?.anneePublication ?? this.data.livre?.anneePublication ?? null as number | null,
+    ],
+    categorie: [this.data.brouillon?.categorie ?? this.data.livre?.categorie ?? ''],
+    stockTotal: [
+      this.data.brouillon?.stockTotal ?? this.data.livre?.stockTotal ?? 1,
+      [Validators.required, Validators.min(0)],
+    ],
+    auteurIds: [
+      this.data.brouillon?.auteurIds ?? this.data.livre?.auteurs.map(a => a.id) ?? [],
+      [Validators.required, Validators.minLength(1)],
+    ],
+    description: [this.data.brouillon?.description ?? this.data.livre?.description ?? ''],
   });
+
+  private subscription = this.form.valueChanges.subscribe(() => {
+    if (!this.estModification) {
+      const raw = this.form.getRawValue();
+      if (raw.titre || raw.isbn || raw.categorie || raw.stockTotal !== 1 || raw.auteurIds.length) {
+        this.brouillonService.sauvegarder(this.CLE_BROUILLON, raw);
+      }
+    }
+  });
+
+  ngOnInit(): void {
+    if (this.estModification) {
+      this.brouillonService.effacer(this.CLE_BROUILLON);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   onFichierChoisi(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -205,6 +289,7 @@ export class LivreDialog {
   valider(): void {
     if (this.form.invalid) return;
     const req: LivreRequest = { ...this.form.getRawValue(), imageUrl: this.apercu() };
+    this.brouillonService.effacer(this.CLE_BROUILLON);
     this.ref.close(req);
   }
 }
