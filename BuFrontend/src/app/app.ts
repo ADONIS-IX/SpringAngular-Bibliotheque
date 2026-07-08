@@ -52,6 +52,17 @@ export class App implements OnInit {
 
   isLoginPage = signal(window.location.pathname === '/login');
 
+  // Initiales utilisées par le badge avatar de la navbar (ex: "Awa Diop" -> "AD")
+  readonly initials = computed(() => {
+    const nom = this.user()?.nom ?? '';
+    return nom
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('');
+  });
+
   private readonly liens: NavLink[] = [
     { path: '/catalogue', label: 'Catalogue', icon: 'bx-book', public: true },
     { path: '/mes-emprunts', label: 'Mes emprunts', icon: 'bx-import', auth: true, etudiant: true },

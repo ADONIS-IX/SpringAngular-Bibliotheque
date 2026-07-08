@@ -22,14 +22,29 @@ export class MesPenalites implements OnInit {
   loading = signal(true);
   colonnes = ['livre', 'joursRetard', 'montant', 'statut', 'date'];
 
-  totalImpaye = computed(() => this.penalites()
-    .filter(p => p.statut === 'NON_PAYEE')
-    .reduce((s, p) => s + p.montant, 0));
+  // Gabarit pour l'état de chargement (lignes fantômes du tableau)
+  readonly skeletons = Array.from({ length: 5 });
+
+  readonly penalitesTriees = computed(() =>
+    [...this.penalites()].sort(
+      (a, b) => new Date(b.dateCreation).getTime() - new Date(a.dateCreation).getTime()
+    )
+  );
+
+  readonly totalImpaye = computed(() =>
+    this.penalites()
+      .filter((p) => p.statut === 'NON_PAYEE')
+      .reduce((s, p) => s + p.montant, 0)
+  );
+
+  readonly nbImpayees = computed(
+    () => this.penalites().filter((p) => p.statut === 'NON_PAYEE').length
+  );
 
   ngOnInit(): void {
     this.penaliteService.mesPenalites().subscribe({
-      next: p => { this.penalites.set(p); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      next: (p) => { this.penalites.set(p); this.loading.set(false); },
+      error: (err) => { this.loading.set(false); this.ui.error(err); },
     });
   }
 }

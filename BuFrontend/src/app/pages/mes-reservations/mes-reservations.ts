@@ -25,6 +25,9 @@ export class MesReservations implements OnInit {
   reservations = signal<Reservation[]>([]);
   loading = signal(true);
 
+  // Gabarits pour l'état de chargement (lignes fantômes)
+  readonly skeletons = Array.from({ length: 4 });
+
   ngOnInit(): void {
     this.charger();
   }
@@ -32,8 +35,8 @@ export class MesReservations implements OnInit {
   charger(): void {
     this.loading.set(true);
     this.reservationService.mesReservations().subscribe({
-      next: r => { this.reservations.set(r); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      next: (r) => { this.reservations.set(r); this.loading.set(false); },
+      error: (err) => { this.loading.set(false); this.ui.error(err); },
     });
   }
 
@@ -43,14 +46,14 @@ export class MesReservations implements OnInit {
         this.ui.success(`« ${r.livre.titre} » emprunté avec succès !`);
         this.router.navigate(['/mes-emprunts']);
       },
-      error: err => this.ui.error(err),
+      error: (err) => this.ui.error(err),
     });
   }
 
   annuler(r: Reservation): void {
     this.reservationService.annuler(r.id).subscribe({
       next: () => { this.ui.success('Réservation annulée'); this.charger(); },
-      error: err => this.ui.error(err),
+      error: (err) => this.ui.error(err),
     });
   }
 
@@ -74,7 +77,22 @@ export class MesReservations implements OnInit {
     }
   }
 
+  // Accent de la vignette / liseré de ligne : reflète le statut
+  accent(s: Reservation['statut']): string {
+    switch (s) {
+      case 'DISPONIBLE': return 'accent-success';
+      case 'EN_ATTENTE': return 'accent-info';
+      case 'CONFIRMEE': return 'accent-neutral';
+      case 'EXPIREE': return 'accent-danger';
+      case 'ANNULEE': return 'accent-muted';
+    }
+  }
+
   active(r: Reservation): boolean {
     return r.statut === 'EN_ATTENTE' || r.statut === 'DISPONIBLE';
+  }
+
+  initiale(r: Reservation): string {
+    return r.livre?.titre?.trim().charAt(0).toUpperCase() || '?';
   }
 }
