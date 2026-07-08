@@ -1,15 +1,213 @@
-.page-card {
-  max-width: 980px;
-  margin: 24px auto;
-  padding: 16px;
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+:host {
+  --ink: #0f1222;
+  --ink-soft: #6b7280;
+  --ink-faint: #9aa0ae;
+  --line: #e8eaf0;
+  --surface: #ffffff;
+  --canvas: #f7f8fa;
+  --indigo: #4f46e5;
+  --indigo-soft: #eef0ff;
+  --gold: #b8842f;
+  --teal: #0f766e;
+  --teal-soft: #e6f5f3;
+  --plum: #86198f;
+  --plum-soft: #f8e9f9;
+  --green: #15803d;
+  --green-soft: #eafaf0;
+  --red: #b91c1c;
+  --red-soft: #fdecec;
+
+  display: block;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.full {
+.page {
+  max-width: 1540px;
   width: 100%;
+  margin: 0 auto;
 }
 
-.loading-container {
+/* ===================== En-tête ===================== */
+.page-header {
   display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+.eyebrow {
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold);
+}
+.page-header h1 {
+  margin: 0;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.page-subtitle {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.btn-primary {
+  background: var(--indigo) !important;
+  color: #fff !important;
+  height: 40px;
+}
+
+/* ===================== Carte tableau ===================== */
+.table-card {
+  border-radius: 14px !important;
+  border: 1px solid var(--line) !important;
+  box-shadow: 0 1px 2px rgba(15, 18, 34, 0.03) !important;
+  overflow: hidden;
+}
+.table-scroll { overflow-x: auto; }
+.full-width { width: 100%; }
+
+::ng-deep .table-card .mat-mdc-header-row {
+  background: var(--canvas);
+}
+::ng-deep .table-card .mat-mdc-header-cell {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  border-bottom: 1px solid var(--line);
+}
+::ng-deep .table-card .mat-mdc-cell {
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--ink);
+}
+::ng-deep .table-card .mat-mdc-row:last-child .mat-mdc-cell {
+  border-bottom: none;
+}
+::ng-deep .table-card .mat-mdc-row:hover {
+  background: var(--canvas);
+}
+
+.titre {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.muted-cell {
+  color: var(--ink-soft);
+}
+
+.actions-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+.icon-btn {
+  color: var(--ink-soft) !important;
+}
+.icon-btn--danger:hover {
+  color: var(--red) !important;
+}
+
+/* ===================== Chips ===================== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+.chip mat-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+}
+.chip-success { background: var(--green-soft); color: var(--green); }
+.chip-danger  { background: var(--red-soft); color: var(--red); }
+.chip-neutral { background: var(--indigo-soft); color: var(--indigo); }
+.chip-teal    { background: var(--teal-soft); color: var(--teal); }
+.chip-plum    { background: var(--plum-soft); color: var(--plum); }
+
+/* ===================== État vide ===================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  padding: 24px 0;
+  text-align: center;
+  gap: 6px;
+  padding: 64px 20px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.empty-state mat-icon {
+  font-size: 34px;
+  width: 34px;
+  height: 34px;
+  color: var(--ink-faint);
+  margin-bottom: 6px;
+}
+.empty-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+}
+.empty-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* ===================== Squelette de chargement ===================== */
+.skeleton { pointer-events: none; }
+.skeleton-rows {
+  display: flex;
+  flex-direction: column;
+}
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 1.6fr 2fr 1fr 0.9fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.skeleton-row:last-child { border-bottom: none; }
+.skeleton-line {
+  height: 13px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef0f4 25%, #f6f7fa 37%, #eef0f4 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+.skeleton-line--title  { width: 70%; height: 15px; }
+.skeleton-line--author { width: 80%; }
+.skeleton-line--tag    { width: 45%; }
+.skeleton-line--stock  { width: 40%; }
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+@media (max-width: 560px) {
+  .page-header { flex-direction: column; align-items: stretch; }
+  .btn-primary { width: 100%; }
 }

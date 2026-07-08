@@ -1,5 +1,4 @@
-import { Component, Inject, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,11 +15,18 @@ export interface UtilisateurDialogData {
 
 @Component({
   selector: 'app-utilisateur-dialog',
-  imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatSlideToggleModule, MatButtonModule],
+  imports: [
+    ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule,
+    MatSelectModule, MatSlideToggleModule, MatButtonModule,
+  ],
   template: `
-    <h2 mat-dialog-title>{{ titre }}</h2>
+    <div class="dialog-head">
+      <p class="eyebrow">{{ isCreate ? 'Nouveau compte' : 'Modification' }}</p>
+      <h2 mat-dialog-title>{{ isCreate ? 'Créer un utilisateur' : (data.utilisateur?.nom ?? 'Modifier l\\'utilisateur') }}</h2>
+    </div>
+
     <mat-dialog-content>
-      <form [formGroup]="form">
+      <form [formGroup]="form" class="dialog-form">
         <mat-form-field appearance="outline" class="full">
           <mat-label>Nom</mat-label>
           <input matInput formControlName="nom" />
@@ -34,34 +40,96 @@ export interface UtilisateurDialogData {
         <mat-form-field appearance="outline" class="full">
           <mat-label>Mot de passe</mat-label>
           <input matInput type="password" formControlName="password" />
-          <mat-hint *ngIf="!isCreate">Laissez vide pour conserver le mot de passe actuel.</mat-hint>
+          @if (!isCreate) {
+            <mat-hint>Laissez vide pour conserver le mot de passe actuel.</mat-hint>
+          }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full">
           <mat-label>Rôle</mat-label>
           <mat-select formControlName="role">
-            <mat-option *ngFor="let option of roleOptions" [value]="option.value" [disabled]="option.disabled">
-              {{ option.label }}
-            </mat-option>
+            @for (option of roleOptions; track option.value) {
+              <mat-option [value]="option.value" [disabled]="option.disabled">
+                {{ option.label }}
+              </mat-option>
+            }
           </mat-select>
         </mat-form-field>
 
-        <mat-slide-toggle formControlName="actif" *ngIf="!isCreate">Actif</mat-slide-toggle>
+        @if (!isCreate) {
+          <mat-slide-toggle formControlName="actif" class="toggle">Compte actif</mat-slide-toggle>
+        }
       </form>
     </mat-dialog-content>
+
     <mat-dialog-actions align="end">
-      <button mat-button (click)="fermer()">Annuler</button>
-      <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="valider()">{{ isCreate ? 'Créer' : 'Modifier' }}</button>
+      <button mat-button (click)="fermer()" class="btn-ghost">Annuler</button>
+      <button mat-flat-button class="btn-primary" [disabled]="form.invalid" (click)="valider()">
+        {{ isCreate ? 'Créer' : 'Modifier' }}
+      </button>
     </mat-dialog-actions>
   `,
+  styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    :host {
+      --ink: #0f1222;
+      --ink-soft: #6b7280;
+      --indigo: #4f46e5;
+      --gold: #b8842f;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .dialog-head {
+      padding: 24px 24px 4px;
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+    h2[mat-dialog-title] {
+      margin: 0;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-weight: 700;
+      font-size: 21px;
+      color: var(--ink);
+    }
+
+    .dialog-form {
+      display: flex;
+      flex-direction: column;
+      min-width: 420px;
+      padding-top: 12px;
+    }
+    .full { width: 100%; }
+    .toggle { margin: 4px 0 8px; }
+
+    mat-dialog-actions {
+      padding: 12px 24px 20px !important;
+    }
+    .btn-ghost {
+      color: var(--ink-soft) !important;
+    }
+    .btn-primary {
+      background: var(--indigo) !important;
+      color: #fff !important;
+    }
+
+    @media (max-width: 480px) {
+      .dialog-form { min-width: 260px; }
+    }
+  `],
 })
 export class UtilisateurDialog {
   private dialogRef = inject(MatDialogRef<UtilisateurDialog>);
   private fb = inject(FormBuilder);
-  private data = inject(MAT_DIALOG_DATA) as UtilisateurDialogData;
+  data = inject(MAT_DIALOG_DATA) as UtilisateurDialogData;
 
   readonly isCreate = this.data.mode === 'create';
-  readonly titre = this.isCreate ? 'Créer un utilisateur' : 'Modifier un utilisateur';
   readonly roleOptions = [
     { value: 'ETUDIANT', label: 'Étudiant' },
     { value: 'BIBLIOTHECAIRE', label: 'Bibliothécaire' },

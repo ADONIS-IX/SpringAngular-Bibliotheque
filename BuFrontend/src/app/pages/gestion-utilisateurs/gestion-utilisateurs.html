@@ -1,48 +1,93 @@
-<mat-card class="page-card">
-  <mat-card-title>Gestion des utilisateurs</mat-card-title>
-  <mat-card-content>
-    <p>Créer un nouvel utilisateur administrateur, bibliothécaire ou étudiant.</p>
-    <button mat-flat-button color="primary" (click)="ouvrir()">Créer un utilisateur</button>
-
-    <div *ngIf="loading()" class="loading-container">
-      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+<div class="page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Gérer les utilisateurs</h1>
+      <p class="page-subtitle">
+        {{ utilisateurs().length }} compte{{ utilisateurs().length > 1 ? 's' : '' }} enregistré{{ utilisateurs().length > 1 ? 's' : '' }}
+      </p>
     </div>
+    <button mat-flat-button class="btn-primary" (click)="ouvrir()">
+      <mat-icon>person_add</mat-icon> Créer un utilisateur
+    </button>
+  </header>
 
-    <table mat-table [dataSource]="utilisateurs()" class="mat-elevation-z2" *ngIf="!loading() && utilisateurs().length > 0">
-      <ng-container matColumnDef="nom">
-        <th mat-header-cell *matHeaderCellDef>Nom</th>
-        <td mat-cell *matCellDef="let utilisateur">{{ utilisateur.nom }}</td>
-      </ng-container>
-      <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>Email</th>
-        <td mat-cell *matCellDef="let utilisateur">{{ utilisateur.email }}</td>
-      </ng-container>
-      <ng-container matColumnDef="role">
-        <th mat-header-cell *matHeaderCellDef>Rôle</th>
-        <td mat-cell *matCellDef="let utilisateur">{{ utilisateur.role }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actif">
-        <th mat-header-cell *matHeaderCellDef>Actif</th>
-        <td mat-cell *matCellDef="let utilisateur">{{ utilisateur.actif ? 'Oui' : 'Non' }}</td>
-      </ng-container>
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let utilisateur">
-          <button mat-icon-button color="primary" (click)="modifier(utilisateur)">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button color="warn" (click)="supprimer(utilisateur)">
-            <mat-icon>delete</mat-icon>
-          </button>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
-      <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
-    </table>
-
-    <div *ngIf="!loading() && utilisateurs().length === 0" class="empty-state">
-      <p>Aucun utilisateur trouvé.</p>
+  @if (loading()) {
+    <mat-card class="table-card skeleton" aria-hidden="true">
+      <div class="skeleton-rows">
+        @for (r of [1,2,3,4,5]; track $index) {
+          <div class="skeleton-row">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--author"></div>
+            <div class="skeleton-line skeleton-line--tag"></div>
+            <div class="skeleton-line skeleton-line--stock"></div>
+          </div>
+        }
+      </div>
+    </mat-card>
+  } @else if (!utilisateurs().length) {
+    <div class="empty-state">
+      <mat-icon>group_off</mat-icon>
+      <p class="empty-title">Aucun utilisateur trouvé</p>
+      <p class="empty-hint">Créez le premier compte pour commencer.</p>
+      <button mat-flat-button class="btn-primary" (click)="ouvrir()">
+        <mat-icon>person_add</mat-icon> Créer un utilisateur
+      </button>
     </div>
-  </mat-card-content>
-</mat-card>
+  } @else {
+    <mat-card class="table-card">
+      <div class="table-scroll">
+        <table mat-table [dataSource]="utilisateurs()" class="full-width">
+          <ng-container matColumnDef="nom">
+            <th mat-header-cell *matHeaderCellDef>Nom</th>
+            <td mat-cell *matCellDef="let u">
+              <span class="titre">{{ u.nom }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let u" class="muted-cell">{{ u.email }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef>Rôle</th>
+            <td mat-cell *matCellDef="let u">
+              @switch (u.role) {
+                @case ('ADMIN') { <span class="chip chip-plum">Admin</span> }
+                @case ('BIBLIOTHECAIRE') { <span class="chip chip-teal">Bibliothécaire</span> }
+                @default { <span class="chip chip-neutral">Étudiant</span> }
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actif">
+            <th mat-header-cell *matHeaderCellDef>Statut</th>
+            <td mat-cell *matCellDef="let u">
+              @if (u.actif) {
+                <span class="chip chip-success"><mat-icon>check_circle</mat-icon>Actif</span>
+              } @else {
+                <span class="chip chip-danger"><mat-icon>block</mat-icon>Désactivé</span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let u" class="actions-cell">
+              <button mat-icon-button class="icon-btn" (click)="modifier(u)" aria-label="Modifier">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button class="icon-btn icon-btn--danger" (click)="supprimer(u)" aria-label="Supprimer">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
+          <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
+        </table>
+      </div>
+    </mat-card>
+  }
+</div>
