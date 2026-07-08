@@ -10,7 +10,6 @@
     --indigo: #4f46e5;
     --indigo-soft: #eef0ff;
     --gold: #b8842f;
-    --gold-soft: #fbf1de;
     --green: #15803d;
     --green-soft: #eafaf0;
     --red: #b91c1c;
@@ -26,10 +25,16 @@
     max-width: 1540px;
     width: 100%;
     margin: 0 auto;
+    padding: 0 16px;
 }
 
 /* ===================== En-tête ===================== */
 .page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
     margin-bottom: 22px;
 }
 
@@ -182,7 +187,7 @@
     font-size: 12.5px;
 }
 
-/* ===================== Chips (identiques au reste de l'admin) ===================== */
+/* ===================== Chips ===================== */
 .chip {
     display: inline-flex;
     align-items: center;
@@ -287,15 +292,15 @@
     height: 15px;
 }
 
-.skeleton-line--author {
+.skeleton-line--emprunteur {
     width: 55%;
 }
 
-.skeleton-line--tag {
-    width: 50%;
+.skeleton-line--dates {
+    width: 65%;
 }
 
-.skeleton-line--stock {
+.skeleton-line--statut {
     width: 40%;
 }
 
@@ -309,8 +314,162 @@
     }
 }
 
-@media (max-width: 560px) {
-    ::ng-deep .tabs .mdc-tab__text-label {
+/* ===================== Responsive ===================== */
+@media (max-width: 768px) {
+    .page {
+        padding: 0 12px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .page-subtitle {
         font-size: 12.5px;
+    }
+
+    ::ng-deep .tabs .mdc-tab__text-label {
+        font-size: 13px;
+    }
+
+    ::ng-deep .table-card .mat-mdc-header-cell,
+    ::ng-deep .table-card .mat-mdc-cell {
+        padding: 10px 12px;
+        font-size: 12.5px;
+    }
+
+    .titre {
+        font-size: 13.5px;
+    }
+
+    .btn-return {
+        font-size: 11.5px;
+        padding: 0 10px;
+    }
+
+    .skeleton-row {
+        grid-template-columns: 1.5fr 1fr 1.2fr 0.7fr;
+        padding: 12px 14px;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page {
+        padding: 0 10px;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-header h1 {
+        font-size: 20px;
+    }
+
+    .page-subtitle {
+        font-size: 11.5px;
+    }
+
+    ::ng-deep .tabs .mdc-tab__text-label {
+        font-size: 12px;
+    }
+
+    .tab-count {
+        font-size: 10px;
+        min-width: 16px;
+        height: 16px;
+        padding: 0 4px;
+    }
+
+    ::ng-deep .table-card .mat-mdc-header-cell,
+    ::ng-deep .table-card .mat-mdc-cell {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .titre {
+        font-size: 12.5px;
+    }
+
+    .chip {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .btn-return {
+        font-size: 10px;
+        padding: 0 8px;
+        height: 28px;
+    }
+
+    .btn-return mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .skeleton-row {
+        grid-template-columns: 1.2fr 1fr 1fr 0.6fr;
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .skeleton-line {
+        height: 10px;
+    }
+
+    .skeleton-line--title {
+        height: 12px;
+    }
+
+    .empty-state {
+        padding: 32px 16px;
+    }
+
+    .empty-state mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .empty-title {
+        font-size: 14px;
+    }
+
+    .empty-hint {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .page {
+        padding: 0 6px;
+    }
+
+    ::ng-deep .tabs .mdc-tab__text-label {
+        font-size: 11px;
+    }
+
+    ::ng-deep .table-card .mat-mdc-header-cell,
+    ::ng-deep .table-card .mat-mdc-cell {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .titre {
+        font-size: 11px;
+    }
+
+    .chip {
+        font-size: 9px;
+        padding: 1px 6px;
+    }
+
+    .btn-return {
+        font-size: 9px;
+        padding: 0 6px;
+        height: 24px;
     }
 }

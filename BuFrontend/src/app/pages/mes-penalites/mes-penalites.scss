@@ -25,6 +25,7 @@
     max-width: 1540px;
     width: 100%;
     margin: 0 auto;
+    padding: 0 16px;
 }
 
 /* ===================== En-tête ===================== */
@@ -33,10 +34,10 @@
 }
 
 .page-logo {
-  height: 114px;
-  width: auto;
-  margin-bottom: 4px;
-  display: block;
+    height: 114px;
+    width: auto;
+    margin-bottom: 4px;
+    display: block;
 }
 
 .page-header h1 {
@@ -294,9 +295,182 @@
     }
 }
 
-/* ===================== Responsive ===================== */
-@media (max-width: 560px) {
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Tablettes et petits écrans (≤ 768px) */
+@media (max-width: 768px) {
+    .page {
+        padding: 0 12px;
+    }
+
+    .page-logo {
+        height: 70px;
+    }
+
+    .page-header h1 {
+        font-size: 24px;
+    }
+
+    .page-subtitle {
+        font-size: 12.5px;
+    }
+
     .balance-banner {
+        padding: 14px 16px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .balance-icon {
+        width: 34px;
+        height: 34px;
+    }
+
+    .balance-amount {
+        font-size: 18px;
+    }
+
+    .balance-hint {
+        font-size: 12px;
+    }
+
+    ::ng-deep .table-card .mat-mdc-header-cell,
+    ::ng-deep .table-card .mat-mdc-cell {
+        padding: 10px 12px;
+        font-size: 12.5px;
+    }
+
+    .cell-date {
+        white-space: nowrap;
+    }
+}
+
+/* Mobiles (≤ 480px) */
+@media (max-width: 480px) {
+    .page {
+        padding: 0 10px;
+    }
+
+    .page-logo {
+        height: 48px;
+        margin-bottom: 2px;
+    }
+
+    .page-header h1 {
+        font-size: 20px;
+    }
+
+    .page-subtitle {
+        font-size: 11.5px;
+    }
+
+    .balance-banner {
+        flex-direction: column;
         align-items: flex-start;
+        padding: 12px 14px;
+        gap: 8px;
+    }
+
+    .balance-icon {
+        width: 30px;
+        height: 30px;
+    }
+
+    .balance-icon mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+    }
+
+    .balance-amount {
+        font-size: 16px;
+    }
+
+    .balance-amount span {
+        font-size: 12px;
+    }
+
+    .balance-hint {
+        font-size: 11px;
+    }
+
+    ::ng-deep .table-card .mat-mdc-header-cell,
+    ::ng-deep .table-card .mat-mdc-cell {
+        padding: 8px 10px;
+        font-size: 11px;
+    }
+
+    .chip {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .note {
+        font-size: 11px;
+        flex-wrap: wrap;
+    }
+
+    .empty-state {
+        padding: 32px 16px;
+    }
+
+    .empty-state mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .empty-title {
+        font-size: 14px;
+    }
+
+    .empty-hint {
+        font-size: 12px;
+    }
+
+    .skeleton-table thead th,
+    .skeleton-table td {
+        padding: 8px 10px;
+    }
+
+    .skeleton-line {
+        height: 10px;
+    }
+
+    .skeleton-chip {
+        width: 50px;
+        height: 16px;
+    }
+}
+
+/* Très petits écrans (≤ 360px) */
+@media (max-width: 360px) {
+    .page {
+        padding: 0 6px;
+    }
+
+    ::ng-deep .table-card .mat-mdc-header-cell,
+    ::ng-deep .table-card .mat-mdc-cell {
+        padding: 6px 8px;
+        font-size: 10px;
+    }
+
+    .balance-amount {
+        font-size: 14px;
+    }
+
+    .balance-hint {
+        font-size: 10px;
+    }
+
+    .note {
+        font-size: 10px;
+    }
+
+    .chip {
+        font-size: 9px;
+        padding: 1px 6px;
     }
 }

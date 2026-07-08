@@ -32,6 +32,7 @@
   max-width: 980px;
   width: 100%;
   margin: 0 auto;
+  padding: 0 16px;
 }
 
 /* ===================== Retour ===================== */
@@ -40,6 +41,7 @@
   font-weight: 500;
   margin-bottom: 16px;
 }
+
 .back mat-icon {
   margin-right: 2px;
 }
@@ -58,20 +60,32 @@
   width: 100%;
   background: var(--indigo);
 }
-.accent-indigo .spine { background: var(--indigo); }
-.accent-gold .spine   { background: var(--gold); }
-.accent-teal .spine   { background: var(--teal); }
-.accent-plum .spine   { background: var(--plum); }
-.accent-slate .spine  { background: var(--slate); }
+
+.accent-indigo .spine {
+  background: var(--indigo);
+}
+
+.accent-gold .spine {
+  background: var(--gold);
+}
+
+.accent-teal .spine {
+  background: var(--teal);
+}
+
+.accent-plum .spine {
+  background: var(--plum);
+}
+
+.accent-slate .spine {
+  background: var(--slate);
+}
 
 .detail-grid {
   display: grid;
   grid-template-columns: 180px 1fr;
   gap: 32px;
   padding: 28px;
-}
-@media (max-width: 640px) {
-  .detail-grid { grid-template-columns: 1fr; }
 }
 
 /* ===================== Colonne couverture + cote ===================== */
@@ -93,25 +107,32 @@
   font-weight: 700;
   font-size: 56px;
 }
-.accent-indigo .cover { background: var(--indigo-soft); color: var(--indigo); }
-.accent-gold .cover   { background: var(--gold-soft); color: var(--gold); }
-.accent-teal .cover   { background: var(--teal-soft); color: var(--teal); }
-.accent-plum .cover   { background: var(--plum-soft); color: var(--plum); }
-.accent-slate .cover  { background: var(--slate-soft); color: var(--slate); }
 
-.cover-image {
-  object-fit: cover;
-  background: none;
+.accent-indigo .cover {
+  background: var(--indigo-soft);
+  color: var(--indigo);
 }
 
-.description {
-  margin: 4px 0 0;
-  color: var(--ink-soft, #4b5563);
-  font-size: 14.5px;
-  line-height: 1.55;
+.accent-gold .cover {
+  background: var(--gold-soft);
+  color: var(--gold);
 }
 
-/* Étiquette façon fiche de classification, collée sous la couverture */
+.accent-teal .cover {
+  background: var(--teal-soft);
+  color: var(--teal);
+}
+
+.accent-plum .cover {
+  background: var(--plum-soft);
+  color: var(--plum);
+}
+
+.accent-slate .cover {
+  background: var(--slate-soft);
+  color: var(--slate);
+}
+
 .cote {
   display: flex;
   flex-direction: column;
@@ -122,6 +143,7 @@
   border-radius: 8px;
   background: var(--canvas);
 }
+
 .cote-label {
   font-size: 10px;
   font-weight: 600;
@@ -129,6 +151,7 @@
   letter-spacing: 0.08em;
   color: var(--ink-faint);
 }
+
 .cote-value {
   font-family: 'Source Serif 4', Georgia, serif;
   font-weight: 600;
@@ -168,10 +191,12 @@
   flex-wrap: wrap;
   margin-bottom: 18px;
 }
+
 .muted {
   font-size: 13px;
   color: var(--ink-soft);
 }
+
 ::ng-deep .auteurs mat-chip {
   --mdc-chip-elevated-container-color: var(--indigo-soft);
   --mdc-chip-label-text-color: var(--indigo);
@@ -189,10 +214,12 @@ mat-divider {
   gap: 8px 12px;
   margin: 0 0 20px;
 }
+
 .meta dt {
   font-size: 12.5px;
   color: var(--ink-soft);
 }
+
 .meta dd {
   margin: 0;
   font-size: 13.5px;
@@ -213,27 +240,31 @@ mat-divider {
   gap: 14px;
   flex-wrap: wrap;
 }
+
 .btn-primary {
   background: var(--indigo) !important;
   color: #fff !important;
 }
+
 .btn-accent {
   background: var(--gold) !important;
   color: #fff !important;
 }
+
 .hint {
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: 12px;
 }
+
 .hint mat-icon {
   font-size: 15px;
   width: 15px;
   height: 15px;
 }
 
-/* ===================== Chips (repris du catalogue) ===================== */
+/* ===================== Chips ===================== */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -245,14 +276,27 @@ mat-divider {
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
+
 .chip mat-icon {
   font-size: 13px;
   width: 13px;
   height: 13px;
 }
-.chip-success { background: var(--green-soft); color: var(--green); }
-.chip-danger  { background: var(--red-soft); color: var(--red); }
-.chip-warn    { background: var(--amber-soft); color: var(--amber); }
+
+.chip-success {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.chip-danger {
+  background: var(--red-soft);
+  color: var(--red);
+}
+
+.chip-warn {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
 
 /* ===================== État vide ===================== */
 .empty-state {
@@ -266,6 +310,7 @@ mat-divider {
   border-radius: 14px;
   background: var(--surface);
 }
+
 .empty-state mat-icon {
   font-size: 34px;
   width: 34px;
@@ -273,12 +318,14 @@ mat-divider {
   color: var(--ink-faint);
   margin-bottom: 10px;
 }
+
 .empty-title {
   margin: 0 0 4px;
   font-weight: 600;
   font-size: 15px;
   color: var(--ink);
 }
+
 .empty-hint {
   margin: 0;
   font-size: 13px;
@@ -290,38 +337,269 @@ mat-divider {
   cursor: default;
   pointer-events: none;
 }
+
 .skeleton .skeleton-bar {
   height: 5px;
   width: 100%;
   background: var(--line);
 }
+
 .skeleton-line {
   border-radius: 6px;
   background: linear-gradient(90deg, #eef0f4 25%, #f6f7fa 37%, #eef0f4 63%);
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
 }
+
 .skeleton-line--cover {
   width: 100%;
   aspect-ratio: 3 / 4;
   border-radius: 12px;
 }
+
 .skeleton-line--eyebrow {
   width: 40%;
   height: 11px;
   margin-bottom: 10px;
 }
+
 .skeleton-line--title {
   width: 80%;
   height: 22px;
   margin-bottom: 14px;
 }
+
 .skeleton-line--author {
   width: 50%;
   height: 14px;
 }
 
 @keyframes shimmer {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+/* Tablettes (≤ 768px) */
+@media (max-width: 768px) {
+  .page {
+    padding: 0 12px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 140px 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .titre {
+    font-size: 22px;
+  }
+
+  .cover {
+    font-size: 42px;
+  }
+
+  .meta {
+    grid-template-columns: 80px 1fr;
+    gap: 6px 10px;
+  }
+
+  .meta dt {
+    font-size: 12px;
+  }
+
+  .meta dd {
+    font-size: 12.5px;
+  }
+
+  .actions {
+    gap: 10px;
+  }
+}
+
+/* Mobiles (≤ 480px) */
+@media (max-width: 480px) {
+  .page {
+    padding: 0 10px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .cover-col {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .cover {
+    width: 100px;
+    aspect-ratio: 3 / 4;
+    font-size: 32px;
+    flex-shrink: 0;
+  }
+
+  .cote {
+    flex: 1;
+    padding: 4px 8px;
+  }
+
+  .cote-value {
+    font-size: 12px;
+  }
+
+  .titre {
+    font-size: 19px;
+    margin-bottom: 10px;
+  }
+
+  .eyebrow {
+    font-size: 10.5px;
+  }
+
+  .auteurs {
+    margin-bottom: 14px;
+  }
+
+  .muted {
+    font-size: 12px;
+  }
+
+  ::ng-deep .auteurs mat-chip {
+    font-size: 11px;
+  }
+
+  .meta {
+    grid-template-columns: 1fr;
+    gap: 2px 0;
+    margin-bottom: 14px;
+  }
+
+  .meta dt {
+    font-size: 11px;
+    margin-top: 6px;
+  }
+
+  .meta dt:first-of-type {
+    margin-top: 0;
+  }
+
+  .meta dd {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .statut-ligne {
+    margin-bottom: 16px;
+  }
+
+  .chip {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .chip mat-icon {
+    font-size: 11px;
+    width: 11px;
+    height: 11px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .actions button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hint {
+    font-size: 11px;
+    justify-content: center;
+  }
+
+  .hint mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
+  }
+
+  .empty-state mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .empty-title {
+    font-size: 14px;
+  }
+
+  .empty-hint {
+    font-size: 12px;
+  }
+
+  .skeleton-line--eyebrow {
+    height: 9px;
+  }
+
+  .skeleton-line--title {
+    height: 18px;
+  }
+
+  .skeleton-line--author {
+    height: 12px;
+  }
+}
+
+/* Très petits écrans (≤ 360px) */
+@media (max-width: 360px) {
+  .page {
+    padding: 0 6px;
+  }
+
+  .detail-grid {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .cover {
+    width: 80px;
+    font-size: 26px;
+  }
+
+  .titre {
+    font-size: 16px;
+  }
+
+  .meta dd {
+    font-size: 11px;
+  }
+
+  .chip {
+    font-size: 9px;
+    padding: 1px 6px;
+  }
+
+  .hint {
+    font-size: 10px;
+  }
 }
