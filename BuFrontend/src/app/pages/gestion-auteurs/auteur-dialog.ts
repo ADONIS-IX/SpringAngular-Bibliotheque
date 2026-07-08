@@ -1,18 +1,24 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { Auteur, AuteurRequest } from '../../core/models';
+import { BrouillonService } from '../../core/brouillon.service';
+
+interface DialogData {
+  auteur: Auteur | null;
+  brouillon?: Partial<Auteur> | null;
+}
 
 @Component({
   selector: 'app-auteur-dialog',
   imports: [ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   template: `
     <div class="dialog-head">
-      <p class="eyebrow">{{ data ? 'Modification' : 'Nouvel auteur' }}</p>
-      <h2 mat-dialog-title>{{ data ? (data.prenom + ' ' + data.nom) : 'Ajouter un auteur' }}</h2>
+      <p class="eyebrow">{{ data.auteur ? 'Modification' : 'Nouvel auteur' }}</p>
+      <h2 mat-dialog-title>{{ data.auteur ? (data.auteur.prenom + ' ' + data.auteur.nom) : 'Ajouter un auteur' }}</h2>
     </div>
 
     <mat-dialog-content>
@@ -93,19 +99,43 @@ import { Auteur, AuteurRequest } from '../../core/models';
     }
   `],
 })
-export class AuteurDialog {
+export class AuteurDialog implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private ref = inject(MatDialogRef<AuteurDialog>);
-  data = inject<Auteur | null>(MAT_DIALOG_DATA);
+  private brouillonService = inject(BrouillonService);
+  data = inject<DialogData>(MAT_DIALOG_DATA);
+  private readonly CLE_BROUILLON = 'auteur';
+
+  estModification = !!this.data.auteur;
 
   form = this.fb.nonNullable.group({
-    nom: [this.data?.nom ?? '', Validators.required],
-    prenom: [this.data?.prenom ?? '', Validators.required],
-    nationalite: [this.data?.nationalite ?? ''],
+    nom: [this.data.brouillon?.nom ?? this.data.auteur?.nom ?? '', Validators.required],
+    prenom: [this.data.brouillon?.prenom ?? this.data.auteur?.prenom ?? '', Validators.required],
+    nationalite: [this.data.brouillon?.nationalite ?? this.data.auteur?.nationalite ?? ''],
   });
+
+  private subscription = this.form.valueChanges.subscribe(() => {
+    if (!this.estModification) {
+      const raw = this.form.getRawValue();
+      if (raw.nom || raw.prenom || raw.nationalite) {
+        this.brouillonService.sauvegarder(this.CLE_BROUILLON, raw);
+      }
+    }
+  });
+
+  ngOnInit(): void {
+    if (this.estModification) {
+      this.brouillonService.effacer(this.CLE_BROUILLON);
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
 
   valider(): void {
     if (this.form.invalid) return;
+    this.brouillonService.effacer(this.CLE_BROUILLON);
     this.ref.close(this.form.getRawValue() as AuteurRequest);
   }
 }
