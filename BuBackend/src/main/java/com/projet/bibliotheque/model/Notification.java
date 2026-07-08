@@ -31,6 +31,15 @@ public class Notification {
     @Column(nullable = false)
     private LocalDateTime dateCreation = LocalDateTime.now();
 
+    // Référence optionnelle pour permettre des actions directes depuis la notification
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emprunt_id")
+    private Emprunt emprunt;
+
     public Notification() {
     }
 
@@ -86,5 +95,21 @@ public class Notification {
 
     public void setDateCreation(LocalDateTime dateCreation) {
         this.dateCreation = dateCreation;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
+
+    public void setReservation(Reservation reservation) {
+        this.reservation = reservation;
+    }
+
+    public Emprunt getEmprunt() {
+        return emprunt;
+    }
+
+    public void setEmprunt(Emprunt emprunt) {
+        this.emprunt = emprunt;
     }
 }

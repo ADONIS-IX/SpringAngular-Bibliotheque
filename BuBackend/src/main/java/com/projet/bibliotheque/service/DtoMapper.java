@@ -99,6 +99,13 @@ public class DtoMapper {
     }
 
     public NotificationDto toNotificationDto(Notification n) {
-        return new NotificationDto(n.getId(), n.getMessage(), n.getType().name(), n.isLue(), n.getDateCreation());
+        return new NotificationDto(
+                n.getId(),
+                n.getMessage(),
+                n.getType().name(),
+                n.isLue(),
+                n.getDateCreation(),
+                n.getReservation() != null ? n.getReservation().getId() : null
+        );
     }
 }

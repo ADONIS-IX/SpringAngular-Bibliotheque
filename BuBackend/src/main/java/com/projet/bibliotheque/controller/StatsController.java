@@ -11,7 +11,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/stats")
-@PreAuthorize("hasAnyRole('BIBLIOTHECAIRE','ADMIN')")
 public class StatsController {
 
     private final StatsService statsService;
@@ -32,6 +31,7 @@ public class StatsController {
      * Pratique pour la démonstration sans attendre le cron quotidien.
      */
     @PostMapping("/traitements")
+    @PreAuthorize("hasAnyRole('BIBLIOTHECAIRE','ADMIN')")
     public ResponseEntity<Map<String, String>> lancerTraitements() {
         return ResponseEntity.ok(Map.of("resultat", schedulerService.executerTraitements()));
     }
