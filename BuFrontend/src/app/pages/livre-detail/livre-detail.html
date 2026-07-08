@@ -23,7 +23,13 @@
 
       <div class="detail-grid">
         <div class="cover-col">
-          <div class="cover">{{ initiale(l) }}</div>
+          <div class="cover">
+            @if (l.imageUrl) {
+              <img [src]="l.imageUrl" [alt]="'Couverture de ' + l.titre" />
+            } @else {
+              {{ initiale(l) }}
+            }
+          </div>
           <div class="cote">
             <span class="cote-label">Cote</span>
             <span class="cote-value">{{ cote(l) }}</span>
@@ -52,6 +58,10 @@
             <dt>Stock</dt>
             <dd>{{ l.stockDisponible }} / {{ l.stockTotal }} exemplaire{{ l.stockTotal > 1 ? 's' : '' }}</dd>
           </dl>
+
+          @if (l.description) {
+            <p class="description">{{ l.description }}</p>
+          }
 
           <div class="statut-ligne">
             @if (l.disponible) {

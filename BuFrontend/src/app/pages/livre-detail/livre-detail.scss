@@ -93,6 +93,9 @@
   font-weight: 700;
   font-size: 56px;
 }
+.cover { overflow: hidden; }
+.cover img { width: 100%; height: 100%; object-fit: cover; }
+
 .accent-indigo .cover { background: var(--indigo-soft); color: var(--indigo); }
 .accent-gold .cover   { background: var(--gold-soft); color: var(--gold); }
 .accent-teal .cover   { background: var(--teal-soft); color: var(--teal); }
@@ -176,6 +179,14 @@ mat-divider {
   grid-template-columns: 100px 1fr;
   gap: 8px 12px;
   margin: 0 0 20px;
+}
+
+.description {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  white-space: pre-line;
 }
 .meta dt {
   font-size: 12.5px;
