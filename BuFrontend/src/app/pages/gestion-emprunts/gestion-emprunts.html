@@ -1,13 +1,15 @@
 <div class="page">
   <header class="page-header">
-    <p class="eyebrow">Administration</p>
-    <h1>Emprunts &amp; retours</h1>
-    <p class="page-subtitle">
-      {{ tous().length }} emprunt{{ tous().length > 1 ? 's' : '' }} au total
-      @if (retards().length > 0) {
-        · {{ retards().length }} en retard
-      }
-    </p>
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Emprunts &amp; retours</h1>
+      <p class="page-subtitle">
+        {{ tous().length }} emprunt{{ tous().length > 1 ? 's' : '' }} au total
+        @if (retards().length > 0) {
+          · {{ retards().length }} en retard
+        }
+      </p>
+    </div>
   </header>
 
   @if (loading()) {
@@ -16,9 +18,9 @@
         @for (r of [1,2,3,4,5]; track $index) {
           <div class="skeleton-row">
             <div class="skeleton-line skeleton-line--title"></div>
-            <div class="skeleton-line skeleton-line--author"></div>
-            <div class="skeleton-line skeleton-line--tag"></div>
-            <div class="skeleton-line skeleton-line--stock"></div>
+            <div class="skeleton-line skeleton-line--emprunteur"></div>
+            <div class="skeleton-line skeleton-line--dates"></div>
+            <div class="skeleton-line skeleton-line--statut"></div>
           </div>
         }
       </div>

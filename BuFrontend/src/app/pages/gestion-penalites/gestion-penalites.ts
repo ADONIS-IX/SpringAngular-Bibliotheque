@@ -1,4 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,10 +12,11 @@ import { Penalite } from '../../core/models';
 @Component({
   selector: 'app-gestion-penalites',
   imports: [
-    MatCardModule, MatTableModule, MatButtonModule, MatIconModule, MatProgressSpinnerModule,
+    CommonModule, MatCardModule, MatTableModule, MatButtonModule,
+    MatIconModule, MatProgressSpinnerModule,
   ],
   templateUrl: './gestion-penalites.html',
-  styleUrl: './gestion-penalites.scss',
+  styleUrls: ['./gestion-penalites.scss'],
 })
 export class GestionPenalites implements OnInit {
   private penaliteService = inject(PenaliteService);
@@ -35,14 +37,23 @@ export class GestionPenalites implements OnInit {
   charger(): void {
     this.loading.set(true);
     this.penaliteService.toutes().subscribe({
-      next: p => { this.penalites.set(p); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      next: p => {
+        this.penalites.set(p);
+        this.loading.set(false);
+      },
+      error: err => {
+        this.ui.error(err);
+        this.loading.set(false);
+      },
     });
   }
 
   payer(p: Penalite): void {
     this.penaliteService.payer(p.id).subscribe({
-      next: () => { this.ui.success('Paiement enregistré'); this.charger(); },
+      next: () => {
+        this.ui.success('Paiement enregistré');
+        this.charger();
+      },
       error: err => this.ui.error(err),
     });
   }
