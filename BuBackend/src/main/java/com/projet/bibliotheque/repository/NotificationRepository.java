@@ -20,4 +20,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     // Anti-doublon pour le scheduler (une seule notif d'échéance par emprunt et par jour)
     boolean existsByUtilisateurIdAndTypeAndMessageContaining(Long utilisateurId, Notification.Type type, String fragment);
+
+    // Purge des notifications d'un utilisateur (avant suppression de son compte)
+    @Modifying
+    @Query("DELETE FROM Notification n WHERE n.utilisateur.id = :utilisateurId")
+    int deleteByUtilisateurId(@Param("utilisateurId") Long utilisateurId);
 }

@@ -31,4 +31,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByStatutAndDateExpirationBefore(Reservation.Statut statut, LocalDateTime date);
 
     long countByStatut(Reservation.Statut statut);
+
+    // Intégrité référentielle avant suppression
+    boolean existsByUtilisateurId(Long utilisateurId);
+
+    boolean existsByLivreId(Long livreId);
 }
