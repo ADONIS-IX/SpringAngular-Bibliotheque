@@ -1,37 +1,67 @@
 <div class="page">
-  <div class="page-header"><h1>Mes emprunts</h1></div>
+
+   <header class="page-header">
+    <img src="/logo.png" alt="Logo bibliothèque" class="page-logo" />
+    <h1>Mes emprunts</h1>
+    <p class="page-subtitle">
+      @if (!loading()) {
+        {{ enCours().length }} en cours
+        @if (enRetard() > 0) { · <span class="alerte">{{ enRetard() }} en retard</span> }
+        · {{ historique().length }} terminé{{ historique().length > 1 ? 's' : '' }}
+      } @else {
+        Chargement de vos emprunts…
+      }
+    </p>
+  </header>
 
   @if (loading()) {
-    <div class="empty-state"><mat-spinner diameter="40" /></div>
+    <div class="rows" aria-hidden="true">
+      @for (s of skeletons; track $index) {
+        <div class="emprunt-row skeleton">
+          <div class="skeleton-line skeleton-line--cover"></div>
+          <div class="row-main">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--dates"></div>
+          </div>
+          <div class="skeleton-line skeleton-line--chip"></div>
+        </div>
+      }
+    </div>
   } @else {
-    <mat-tab-group>
+    <mat-tab-group class="tabs" animationDuration="150ms">
       <mat-tab [label]="'En cours (' + enCours().length + ')'">
         @if (enCours().length === 0) {
-          <div class="empty-state"><mat-icon>inbox</mat-icon><p>Aucun emprunt en cours</p></div>
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p class="empty-title">Aucun emprunt en cours</p>
+            <p class="empty-hint">Les ouvrages que vous empruntez apparaîtront ici.</p>
+          </div>
         } @else {
-          <div class="cards">
+          <div class="rows">
             @for (e of enCours(); track e.id) {
-              <mat-card class="emprunt-card">
-                <mat-card-content>
-                  <div class="ligne-titre">
-                    <mat-icon>menu_book</mat-icon>
-                    <h3>{{ e.livre.titre }}</h3>
-                    <span class="spacer"></span>
-                    <span class="chip" [class]="classeEcheance(e)">{{ texteEcheance(e) }}</span>
-                  </div>
-                  <div class="dates muted">
-                    Emprunté le {{ e.dateEmprunt | date:'dd/MM/yyyy' }} ·
-                    à rendre le {{ e.dateRetourPrevue | date:'dd/MM/yyyy' }}
+              <div class="emprunt-row" [class]="accentEnCours(e)">
+                <span class="cover">{{ initiale(e) }}</span>
+
+                <div class="row-main">
+                  <h3 class="titre">{{ e.livre.titre }}</h3>
+                  <p class="dates">
+                    Emprunté le {{ e.dateEmprunt | date:'dd/MM/yyyy' }}
+                    · à rendre le {{ e.dateRetourPrevue | date:'dd/MM/yyyy' }}
                     @if (e.prolonge) { · <em>déjà prolongé</em> }
-                  </div>
-                  <div class="actions">
-                    <button mat-stroked-button (click)="prolonger(e)"
-                            [disabled]="e.prolonge || e.enRetard">
-                      <mat-icon>update</mat-icon> Prolonger
-                    </button>
-                  </div>
-                </mat-card-content>
-              </mat-card>
+                  </p>
+                </div>
+
+                <span class="chip" [class]="classeEcheance(e)">{{ texteEcheance(e) }}</span>
+
+                <button
+                  mat-stroked-button
+                  class="action"
+                  (click)="prolonger(e)"
+                  [disabled]="e.prolonge || e.enRetard"
+                >
+                  <mat-icon>update</mat-icon> Prolonger
+                </button>
+              </div>
             }
           </div>
         }
@@ -39,32 +69,36 @@
 
       <mat-tab [label]="'Historique (' + historique().length + ')'">
         @if (historique().length === 0) {
-          <div class="empty-state"><mat-icon>history</mat-icon><p>Aucun emprunt terminé</p></div>
+          <div class="empty-state">
+            <mat-icon>history</mat-icon>
+            <p class="empty-title">Aucun emprunt terminé</p>
+            <p class="empty-hint">L'historique de vos retours s'affichera ici.</p>
+          </div>
         } @else {
-          <div class="cards">
+          <div class="rows">
             @for (e of historique(); track e.id) {
-              <mat-card class="emprunt-card">
-                <mat-card-content>
-                  <div class="ligne-titre">
-                    <mat-icon>menu_book</mat-icon>
-                    <h3>{{ e.livre.titre }}</h3>
-                    <span class="spacer"></span>
-                    @if (e.penalite) {
-                      <span class="chip chip-danger">Pénalité {{ e.penalite.montant }} FCFA</span>
-                    } @else {
-                      <span class="chip chip-neutral">Rendu</span>
-                    }
-                  </div>
-                  <div class="dates muted">
+              <div class="emprunt-row accent-neutral">
+                <span class="cover">{{ initiale(e) }}</span>
+
+                <div class="row-main">
+                  <h3 class="titre">{{ e.livre.titre }}</h3>
+                  <p class="dates">
                     Rendu le {{ e.dateRetourEffective | date:'dd/MM/yyyy' }}
                     (prévu le {{ e.dateRetourPrevue | date:'dd/MM/yyyy' }})
-                  </div>
-                </mat-card-content>
-              </mat-card>
+                  </p>
+                </div>
+
+                @if (e.penalite) {
+                  <span class="chip chip-danger">Pénalité {{ e.penalite.montant }} FCFA</span>
+                } @else {
+                  <span class="chip chip-neutral">Rendu</span>
+                }
+              </div>
             }
           </div>
         }
       </mat-tab>
     </mat-tab-group>
   }
+
 </div>

@@ -25,8 +25,12 @@ export class MesEmprunts implements OnInit {
   emprunts = signal<Emprunt[]>([]);
   loading = signal(true);
 
-  enCours = computed(() => this.emprunts().filter(e => !e.dateRetourEffective));
-  historique = computed(() => this.emprunts().filter(e => e.dateRetourEffective));
+  // Gabarits pour l'état de chargement (lignes fantômes)
+  readonly skeletons = Array.from({ length: 4 });
+
+  enCours = computed(() => this.emprunts().filter((e) => !e.dateRetourEffective));
+  historique = computed(() => this.emprunts().filter((e) => e.dateRetourEffective));
+  enRetard = computed(() => this.enCours().filter((e) => e.enRetard).length);
 
   ngOnInit(): void {
     this.charger();
@@ -35,15 +39,15 @@ export class MesEmprunts implements OnInit {
   charger(): void {
     this.loading.set(true);
     this.empruntService.mesEmprunts().subscribe({
-      next: e => { this.emprunts.set(e); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      next: (e) => { this.emprunts.set(e); this.loading.set(false); },
+      error: (err) => { this.loading.set(false); this.ui.error(err); },
     });
   }
 
   prolonger(e: Emprunt): void {
     this.empruntService.prolonger(e.id).subscribe({
       next: () => { this.ui.success('Emprunt prolongé de 7 jours'); this.charger(); },
-      error: err => this.ui.error(err),
+      error: (err) => this.ui.error(err),
     });
   }
 
@@ -57,5 +61,16 @@ export class MesEmprunts implements OnInit {
     if (e.enRetard) return `En retard de ${-e.joursRestants} j`;
     if (e.joursRestants === 0) return "À rendre aujourd'hui";
     return `${e.joursRestants} j restant(s)`;
+  }
+
+  // Accent de la vignette : reflète l'urgence plutôt qu'une catégorie
+  accentEnCours(e: Emprunt): string {
+    if (e.enRetard) return 'accent-danger';
+    if (e.joursRestants <= 2) return 'accent-warn';
+    return 'accent-success';
+  }
+
+  initiale(e: Emprunt): string {
+    return e.livre?.titre?.trim().charAt(0).toUpperCase() || '?';
   }
 }
