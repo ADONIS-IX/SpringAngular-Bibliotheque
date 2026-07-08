@@ -77,7 +77,7 @@ export class App implements OnInit {
       children: [
         { path: '/gestion-livres', label: 'Livres', icon: 'bx-book' },
         { path: '/gestion-auteurs', label: 'Auteurs', icon: 'bx-user' },
-        { path: '/gestion-emprunts', label: 'Emprunts & retours', icon: 'bx-return' },
+        { path: '/gestion-emprunts', label: 'Emprunts & retours', icon: 'bx-transfer' },
         { path: '/gestion-penalites', label: 'Pénalités', icon: 'bx-wallet' },
       ],
     },
