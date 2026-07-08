@@ -6,9 +6,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AuteurService } from '../../core/api.service';
+import { BrouillonService } from '../../core/brouillon.service';
 import { Ui } from '../../core/ui';
 import { Auteur } from '../../core/models';
 import { AuteurDialog } from './auteur-dialog';
+import { ConfirmDialog } from '../../core/confirm-dialog';
 
 @Component({
   selector: 'app-gestion-auteurs',
@@ -23,6 +25,8 @@ export class GestionAuteurs implements OnInit {
   private auteurService = inject(AuteurService);
   private dialog = inject(MatDialog);
   private ui = inject(Ui);
+  private brouillonService = inject(BrouillonService);
+  private readonly CLE_BROUILLON = 'auteur';
 
   auteurs = signal<Auteur[]>([]);
   loading = signal(true);
@@ -35,30 +39,63 @@ export class GestionAuteurs implements OnInit {
   charger(): void {
     this.loading.set(true);
     this.auteurService.lister().subscribe({
-      next: a => { this.auteurs.set(a); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      next: (a) => {
+        this.auteurs.set(a);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.ui.error(err);
+      },
     });
   }
 
   ouvrir(auteur?: Auteur): void {
-    const ref = this.dialog.open(AuteurDialog, { data: auteur ?? null });
-    ref.afterClosed().subscribe(req => {
+    // En création, on récupère le brouillon ; en modification, on passe null
+    const brouillon = auteur ? null : this.brouillonService.getBrouillon<Partial<Auteur>>(this.CLE_BROUILLON);
+
+    const ref = this.dialog.open(AuteurDialog, {
+      data: { auteur: auteur ?? null, brouillon: brouillon },
+    });
+
+    ref.afterClosed().subscribe((req) => {
       if (!req) return;
+      this.brouillonService.effacer(this.CLE_BROUILLON);
+
       const obs = auteur
         ? this.auteurService.modifier(auteur.id, req)
         : this.auteurService.creer(req);
+
       obs.subscribe({
-        next: () => { this.ui.success('Auteur enregistré'); this.charger(); },
-        error: err => this.ui.error(err),
+        next: () => {
+          this.ui.success('Auteur enregistré');
+          this.charger();
+        },
+        error: (err) => this.ui.error(err),
       });
     });
   }
 
   supprimer(auteur: Auteur): void {
-    if (!confirm(`Supprimer l'auteur ${auteur.prenom} ${auteur.nom} ?`)) return;
-    this.auteurService.supprimer(auteur.id).subscribe({
-      next: () => { this.ui.success('Auteur supprimé'); this.charger(); },
-      error: err => this.ui.error(err),
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        titre: 'Supprimer cet auteur ?',
+        message: `« ${auteur.prenom} ${auteur.nom} » sera définitivement retiré.`,
+        detail: 'Cette action est irréversible.',
+        confirmLabel: 'Supprimer',
+        danger: true,
+      },
+    });
+
+    ref.afterClosed().subscribe((confirme) => {
+      if (!confirme) return;
+      this.auteurService.supprimer(auteur.id).subscribe({
+        next: () => {
+          this.ui.success('Auteur supprimé');
+          this.charger();
+        },
+        error: (err) => this.ui.error(err),
+      });
     });
   }
 }
