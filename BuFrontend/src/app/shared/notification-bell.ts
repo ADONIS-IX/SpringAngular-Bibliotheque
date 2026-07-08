@@ -5,8 +5,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatMenuModule, MatMenuTrigger } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
-import { NotificationService } from '../core/api.service';
+import { NotificationService, ReservationService } from '../core/api.service';
 import { Notification } from '../core/models';
+import { Ui } from '../core/ui';
 
 @Component({
   selector: 'app-notification-bell',
@@ -28,13 +29,33 @@ import { Notification } from '../core/models';
         <div class="notif-empty">Aucune notification</div>
       }
       @for (n of notifications(); track n.id) {
-        <button mat-menu-item class="notif-item" [class.non-lue]="!n.lue" (click)="lire(n)">
-          <mat-icon [class]="'icon-' + n.type">{{ icone(n.type) }}</mat-icon>
-          <div class="notif-text">
-            <div class="notif-msg">{{ n.message }}</div>
-            <div class="notif-date">{{ n.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
+        @if (n.type === 'RESERVATION_DISPONIBLE' && n.reservationId) {
+          <div class="notif-item notif-with-actions" [class.non-lue]="!n.lue">
+            <div class="notif-content" (click)="lire(n)">
+              <mat-icon [class]="'icon-' + n.type">{{ icone(n.type) }}</mat-icon>
+              <div class="notif-text">
+                <div class="notif-msg">{{ n.message }}</div>
+                <div class="notif-date">{{ n.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
+              </div>
+            </div>
+            <div class="notif-actions">
+              <button mat-stroked-button size="small" (click)="confirmerPrise(n.reservationId!, $event)">
+                <mat-icon>check</mat-icon> Je le prend
+              </button>
+              <button mat-stroked-button size="small" (click)="refuserPrise(n.reservationId!, $event)">
+                <mat-icon>close</mat-icon> Non
+              </button>
+            </div>
           </div>
-        </button>
+        } @else {
+          <button mat-menu-item class="notif-item" [class.non-lue]="!n.lue" (click)="lire(n)">
+            <mat-icon [class]="'icon-' + n.type">{{ icone(n.type) }}</mat-icon>
+            <div class="notif-text">
+              <div class="notif-msg">{{ n.message }}</div>
+              <div class="notif-date">{{ n.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+          </button>
+        }
       }
     </mat-menu>
   `,
@@ -54,10 +75,40 @@ import { Notification } from '../core/models';
     .icon-ECHEANCE_PROCHE { color: #ed6c02; }
     .icon-RESERVATION_DISPONIBLE { color: #2e7d32; }
     .icon-INFO { color: #0288d1; }
+    .notif-with-actions {
+      display: flex;
+      flex-direction: column;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--mat-sys-outline-variant);
+    }
+    .notif-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .notif-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+      justify-content: flex-end;
+    }
+    .notif-actions button {
+      font-size: 11px;
+      padding: 4px 8px;
+      height: 28px;
+    }
+    .notif-actions mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
   `],
 })
 export class NotificationBell implements OnInit, OnDestroy {
   private service = inject(NotificationService);
+  private reservationService = inject(ReservationService);
+  private ui = inject(Ui);
 
   nonLues = signal(0);
   notifications = signal<Notification[]>([]);
@@ -96,6 +147,30 @@ export class NotificationBell implements OnInit, OnDestroy {
     this.service.marquerToutLu().subscribe(() => {
       this.notifications.update(l => l.map(n => ({ ...n, lue: true })));
       this.nonLues.set(0);
+    });
+  }
+
+  confirmerPrise(reservationId: number, event: Event): void {
+    event.stopPropagation();
+    this.reservationService.confirmerPrise(reservationId).subscribe({
+      next: () => {
+        this.ui.success('Livre emprunté avec succès !');
+        this.charger();
+        this.rafraichirCompteur();
+      },
+      error: (err: any) => this.ui.error(err),
+    });
+  }
+
+  refuserPrise(reservationId: number, event: Event): void {
+    event.stopPropagation();
+    this.reservationService.refuserPrise(reservationId).subscribe({
+      next: () => {
+        this.ui.success('Réservation refusée');
+        this.charger();
+        this.rafraichirCompteur();
+      },
+      error: (err: any) => this.ui.error(err),
     });
   }
 

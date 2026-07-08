@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import {
   Auteur, AuteurRequest, Dashboard, Emprunt, Livre, LivreRequest,
-  Notification, Penalite, Reservation, CreateUserRequest, Utilisateur,
+  Notification, Penalite, Reservation, CreateUserRequest, UpdateUserRequest, Utilisateur,
 } from './models';
 
 @Injectable({ providedIn: 'root' })
@@ -47,7 +47,8 @@ export class ReservationService {
   private http = inject(HttpClient);
   reserver(livreId: number): Observable<Reservation> { return this.http.post<Reservation>('/api/reservations', { livreId }); }
   mesReservations(): Observable<Reservation[]> { return this.http.get<Reservation[]>('/api/reservations/mes-reservations'); }
-  confirmer(id: number): Observable<Emprunt> { return this.http.post<Emprunt>(`/api/reservations/${id}/confirmer`, {}); }
+  confirmerPrise(id: number): Observable<Emprunt> { return this.http.post<Emprunt>(`/api/reservations/${id}/confirmer-prise`, {}); }
+  refuserPrise(id: number): Observable<void> { return this.http.post<void>(`/api/reservations/${id}/refuser-prise`, {}); }
   annuler(id: number): Observable<void> { return this.http.delete<void>(`/api/reservations/${id}`); }
   toutes(): Observable<Reservation[]> { return this.http.get<Reservation[]>('/api/reservations'); }
 }
@@ -75,8 +76,21 @@ export class AdminService {
   creerUtilisateur(req: CreateUserRequest): Observable<Utilisateur> {
     return this.http.post<Utilisateur>('/api/admin/users', req);
   }
+
+  listerUtilisateurs(): Observable<Utilisateur[]> {
+    return this.http.get<Utilisateur[]>('/api/admin/users');
+  }
+
+  modifierUtilisateur(id: number, req: UpdateUserRequest): Observable<Utilisateur> {
+    return this.http.put<Utilisateur>(`/api/admin/users/${id}`, req);
+  }
+
+  supprimerUtilisateur(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/admin/users/${id}`);
+  }
 }
 
+@Injectable({ providedIn: 'root' })
 export class StatsService {
   private http = inject(HttpClient);
   dashboard(): Observable<Dashboard> { return this.http.get<Dashboard>('/api/stats/dashboard'); }
