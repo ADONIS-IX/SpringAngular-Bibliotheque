@@ -81,7 +81,7 @@ export class App implements OnInit {
         { path: '/gestion-penalites', label: 'Pénalités', icon: 'bx-wallet' },
       ],
     },
-    { path: '/dashboard', label: 'Tableau de bord', icon: 'bx-dashboard', auth: true, biblio: true },
+    { path: '/dashboard', label: 'Tableau de bord', icon: 'bx-grid-alt', auth: true, biblio: true },
     { path: '/gestion-utilisateurs', label: 'Gérer les utilisateurs', icon: 'bx-group', auth: true, admin: true },
   ];
 
