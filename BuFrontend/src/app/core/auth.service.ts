@@ -20,6 +20,7 @@ export class AuthService {
     const r = this.currentUser()?.role;
     return r === 'BIBLIOTHECAIRE' || r === 'ADMIN';
   });
+  readonly isAdmin = computed(() => this.currentUser()?.role === 'ADMIN');
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>('/api/auth/login', { email, password })

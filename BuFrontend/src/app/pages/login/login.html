@@ -3,9 +3,10 @@
     @if (loading()) { <mat-progress-bar mode="indeterminate" /> }
     <mat-card-content>
       <div class="auth-brand">
-        <mat-icon>local_library</mat-icon>
-        <h1>Bibliothèque Universitaire</h1>
-        <p class="muted">Connectez-vous pour gérer vos emprunts</p>
+        <span class="badge"><mat-icon>local_library</mat-icon></span>
+        <p class="eyebrow">Bibliothèque universitaire</p>
+        <h1>Se connecter</h1>
+        <p class="muted">Accédez à vos emprunts et réservations</p>
       </div>
 
       <form [formGroup]="form" (ngSubmit)="submit()">
@@ -41,7 +42,7 @@
       </p>
 
       <div class="demo-box">
-        <span class="muted">Comptes de démonstration :</span>
+        <span class="muted">Comptes de démonstration</span>
         <div class="demo-chips">
           @for (c of comptesDemo; track c.email) {
             <button mat-stroked-button type="button" (click)="remplir(c)">{{ c.label }}</button>

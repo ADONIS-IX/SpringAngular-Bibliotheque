@@ -109,9 +109,9 @@ public class SchedulerService {
             reservationRepository.save(r);
             notificationService.creer(r.getUtilisateur(),
                     "Votre réservation du livre « " + r.getLivre().getTitre()
-                            + " » a expiré (délai de retrait dépassé).",
+                            + " » a expiré (délai de 48h dépassé sans réponse). Le livre a été proposé au suivant de la file.",
                     Notification.Type.INFO);
-            // L'exemplaire mis de côté passe au suivant, sinon retourne en stock
+            // L'exemplaire passe au suivant de la file
             reservationService.libererExemplaire(r.getLivre());
             compteur++;
         }

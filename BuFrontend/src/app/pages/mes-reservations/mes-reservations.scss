@@ -1,15 +1,259 @@
-.cards { display: flex; flex-direction: column; gap: 12px; }
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-.resa-card .ligne-titre {
+:host {
+  --ink: #0f1222;
+  --ink-soft: #6b7280;
+  --ink-faint: #9aa0ae;
+  --line: #e8eaf0;
+  --surface: #ffffff;
+  --indigo: #4f46e5;
+  --indigo-soft: #eef0ff;
+  --gold: #b8842f;
+  --green: #15803d;
+  --green-soft: #eafaf0;
+  --red: #b91c1c;
+  --red-soft: #fdecec;
+  --sky: #0369a1;
+  --sky-soft: #e6f2fb;
+  --slate: #475569;
+  --slate-soft: #eef1f5;
+
+  display: block;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.page {
+  max-width: 1540px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ===================== En-tête ===================== */
+.page-header {
+  margin-bottom: 18px;
+}
+.page-logo {
+  height: 114px;
+  width: auto;
+  margin-bottom: 4px;
+  display: block;
+}
+.page-header h1 {
+  margin: 0;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.page-subtitle {
+  margin: 4px 0 0;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+
+/* ===================== Lignes de réservation ===================== */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resa-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 3px solid transparent;
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
-.resa-card h3 { margin: 0; font: var(--mat-sys-title-medium); }
-.spacer { flex: 1 1 auto; }
-.details { font-size: 13px; margin: 8px 0; }
-.actions { display: flex; gap: 8px; margin-top: 4px; }
+.resa-row:hover {
+  box-shadow: 0 6px 18px rgba(15, 18, 34, 0.06);
+}
 
+.cover {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.cover mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.row-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.titre {
+  margin: 0 0 3px;
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.details {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+.details strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn-confirm {
+  background: var(--green) !important;
+  color: #ffffff !important;
+  border-radius: 9px !important;
+  font-weight: 600 !important;
+}
+.btn-cancel {
+  border-radius: 9px !important;
+  border-color: var(--line) !important;
+  color: var(--ink-soft) !important;
+}
+
+/* Accents par statut — vignette + liseré gauche de la ligne */
+.accent-success { border-left-color: var(--green); }
+.accent-success .cover { background: var(--green-soft); color: var(--green); }
+
+.accent-info { border-left-color: var(--sky); }
+.accent-info .cover { background: var(--sky-soft); color: var(--sky); }
+
+.accent-neutral { border-left-color: var(--indigo); }
+.accent-neutral .cover { background: var(--indigo-soft); color: var(--indigo); }
+
+.accent-danger { border-left-color: var(--red); }
+.accent-danger .cover { background: var(--red-soft); color: var(--red); }
+
+.accent-muted {
+  border-left-color: var(--slate);
+  opacity: 0.6;
+}
+.accent-muted .cover { background: var(--slate-soft); color: var(--slate); }
+
+/* Réservation prête à retirer : mise en avant, échéance à ne pas manquer */
 .highlight {
-  border: 2px solid var(--mat-sys-primary);
+  background: var(--green-soft);
+  border-color: var(--green);
+  border-left-width: 3px;
+}
+.highlight .titre {
+  color: #0b3d20;
+}
+
+/* ===================== Chips ===================== */
+.chip {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.chip-success { background: var(--green-soft); color: var(--green); }
+.chip-info    { background: var(--sky-soft); color: var(--sky); }
+.chip-neutral { background: var(--indigo-soft); color: var(--indigo); }
+.chip-danger  { background: var(--red-soft); color: var(--red); }
+
+/* ===================== État vide ===================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 64px 20px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.empty-state mat-icon {
+  font-size: 34px;
+  width: 34px;
+  height: 34px;
+  color: var(--ink-faint);
+  margin-bottom: 10px;
+}
+.empty-title {
+  margin: 0 0 4px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+}
+.empty-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+/* ===================== Squelettes de chargement ===================== */
+.skeleton {
+  border-left-color: transparent;
+  pointer-events: none;
+}
+.skeleton-line {
+  border-radius: 6px;
+  background: linear-gradient(90deg, #eef0f4 25%, #f6f7fa 37%, #eef0f4 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+.skeleton-line--cover {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.skeleton-line--title {
+  width: 45%;
+  height: 15px;
+  margin-bottom: 8px;
+}
+.skeleton-line--details {
+  width: 65%;
+  height: 12px;
+}
+.skeleton-line--chip {
+  width: 110px;
+  height: 24px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* ===================== Responsive ===================== */
+@media (max-width: 640px) {
+  .resa-row {
+    flex-wrap: wrap;
+  }
+  .row-main {
+    flex-basis: 100%;
+    order: 1;
+  }
+  .actions {
+    order: 2;
+  }
 }

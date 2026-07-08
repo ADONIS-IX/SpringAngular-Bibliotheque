@@ -11,6 +11,10 @@ import { AuthService } from '../../core/auth.service';
 import { Ui } from '../../core/ui';
 import { Livre } from '../../core/models';
 
+// Même palette d'accents que le catalogue, pour une identité visuelle continue
+// entre la carte de la grille et sa fiche détaillée.
+const ACCENTS = ['accent-indigo', 'accent-gold', 'accent-teal', 'accent-plum', 'accent-slate'] as const;
+
 @Component({
   selector: 'app-livre-detail',
   imports: [
@@ -68,6 +72,33 @@ export class LivreDetail implements OnInit {
       },
       error: err => { this.action.set(false); this.ui.error(err); },
     });
+  }
+
+  auteurs(livre: Livre): string {
+    return livre.auteurs.map((a) => a.nomComplet).join(', ');
+  }
+
+  initiale(livre: Livre): string {
+    return livre.titre?.trim().charAt(0).toUpperCase() || '?';
+  }
+
+  // Identique à la logique du catalogue : même clé de hash → même accent
+  accent(livre: Livre): string {
+    const cle = livre.categorie || 'Non classé';
+    let hash = 0;
+    for (let i = 0; i < cle.length; i++) {
+      hash = (hash * 31 + cle.charCodeAt(i)) >>> 0;
+    }
+    return ACCENTS[hash % ACCENTS.length];
+  }
+
+  // Cote de classification façon fiche de bibliothèque : 3 lettres de la
+  // catégorie + identifiant, ex. "SCI-014"
+  cote(livre: Livre): string {
+    const prefixe = (livre.categorie || 'GEN')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) || 'GEN';
+    return `${prefixe}-${String(livre.id).padStart(3, '0')}`;
   }
 
   private exigeConnexion(): boolean {

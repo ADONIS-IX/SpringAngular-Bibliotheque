@@ -10,7 +10,11 @@ import { Auteur, AuteurRequest } from '../../core/models';
   selector: 'app-auteur-dialog',
   imports: [ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule],
   template: `
-    <h2 mat-dialog-title>{{ data ? 'Modifier' : 'Nouvel' }} auteur</h2>
+    <div class="dialog-head">
+      <p class="eyebrow">{{ data ? 'Modification' : 'Nouvel auteur' }}</p>
+      <h2 mat-dialog-title>{{ data ? (data.prenom + ' ' + data.nom) : 'Ajouter un auteur' }}</h2>
+    </div>
+
     <mat-dialog-content>
       <form [formGroup]="form" class="dialog-form">
         <mat-form-field appearance="outline" class="full">
@@ -27,12 +31,67 @@ import { Auteur, AuteurRequest } from '../../core/models';
         </mat-form-field>
       </form>
     </mat-dialog-content>
+
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Annuler</button>
-      <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="valider()">Enregistrer</button>
+      <button mat-button mat-dialog-close class="btn-ghost">Annuler</button>
+      <button mat-flat-button class="btn-primary" [disabled]="form.invalid" (click)="valider()">
+        Enregistrer
+      </button>
     </mat-dialog-actions>
   `,
-  styles: [`.dialog-form { display: flex; flex-direction: column; min-width: 320px; padding-top: 8px; } .full { width: 100%; }`],
+  styles: [`
+    @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
+
+    :host {
+      --ink: #0f1222;
+      --ink-soft: #6b7280;
+      --indigo: #4f46e5;
+      --gold: #b8842f;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .dialog-head {
+      padding: 24px 24px 4px;
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+    }
+    h2[mat-dialog-title] {
+      margin: 0;
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-weight: 700;
+      font-size: 21px;
+      color: var(--ink);
+    }
+
+    .dialog-form {
+      display: flex;
+      flex-direction: column;
+      min-width: 340px;
+      padding-top: 12px;
+    }
+    .full { width: 100%; }
+
+    mat-dialog-actions {
+      padding: 12px 24px 20px !important;
+    }
+    .btn-ghost {
+      color: var(--ink-soft) !important;
+    }
+    .btn-primary {
+      background: var(--indigo) !important;
+      color: #fff !important;
+    }
+
+    @media (max-width: 400px) {
+      .dialog-form { min-width: 240px; }
+    }
+  `],
 })
 export class AuteurDialog {
   private fb = inject(FormBuilder);

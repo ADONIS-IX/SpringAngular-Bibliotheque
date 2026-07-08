@@ -23,3 +23,14 @@ export const bibliothecaireGuard: CanActivateFn = () => {
   router.navigate(['/catalogue']);
   return false;
 };
+
+/** Réservé aux administrateurs uniquement. */
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  if (auth.isAdmin()) {
+    return true;
+  }
+  router.navigate(['/catalogue']);
+  return false;
+};

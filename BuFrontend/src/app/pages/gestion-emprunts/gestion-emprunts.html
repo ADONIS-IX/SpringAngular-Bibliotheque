@@ -1,57 +1,98 @@
 <div class="page">
-  <div class="page-header"><h1>Emprunts &amp; retours</h1></div>
+  <header class="page-header">
+    <p class="eyebrow">Administration</p>
+    <h1>Emprunts &amp; retours</h1>
+    <p class="page-subtitle">
+      {{ tous().length }} emprunt{{ tous().length > 1 ? 's' : '' }} au total
+      @if (retards().length > 0) {
+        · {{ retards().length }} en retard
+      }
+    </p>
+  </header>
 
   @if (loading()) {
-    <div class="empty-state"><mat-spinner diameter="40" /></div>
+    <mat-card class="table-card skeleton" aria-hidden="true">
+      <div class="skeleton-rows">
+        @for (r of [1,2,3,4,5]; track $index) {
+          <div class="skeleton-row">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--author"></div>
+            <div class="skeleton-line skeleton-line--tag"></div>
+            <div class="skeleton-line skeleton-line--stock"></div>
+          </div>
+        }
+      </div>
+    </mat-card>
   } @else {
-    <mat-tab-group>
-      <mat-tab [label]="'Retards (' + retards().length + ')'">
-        <ng-container [ngTemplateOutlet]="tableTpl" [ngTemplateOutletContext]="{ data: retards() }"></ng-container>
+    <mat-tab-group class="tabs" animationDuration="150ms">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Retards
+          <span class="tab-count" [class.tab-count--danger]="retards().length > 0">{{ retards().length }}</span>
+        </ng-template>
+        <ng-container [ngTemplateOutlet]="tableTpl" [ngTemplateOutletContext]="{ data: retards(), vide: 'Aucun retard — tout est en règle.' }"></ng-container>
       </mat-tab>
-      <mat-tab [label]="'Tous les emprunts (' + tous().length + ')'">
-        <ng-container [ngTemplateOutlet]="tableTpl" [ngTemplateOutletContext]="{ data: tous() }"></ng-container>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          Tous les emprunts
+          <span class="tab-count">{{ tous().length }}</span>
+        </ng-template>
+        <ng-container [ngTemplateOutlet]="tableTpl" [ngTemplateOutletContext]="{ data: tous(), vide: 'Aucun emprunt enregistré.' }"></ng-container>
       </mat-tab>
     </mat-tab-group>
   }
 
-  <ng-template #tableTpl let-data="data">
+  <ng-template #tableTpl let-data="data" let-vide="vide">
     @if (data.length === 0) {
-      <div class="empty-state"><mat-icon>check_circle</mat-icon><p>Rien à afficher</p></div>
+      <div class="empty-state">
+        <mat-icon>check_circle</mat-icon>
+        <p class="empty-title">Rien à afficher</p>
+        <p class="empty-hint">{{ vide }}</p>
+      </div>
     } @else {
       <mat-card class="table-card">
         <div class="table-scroll">
           <table mat-table [dataSource]="data" class="full-width">
             <ng-container matColumnDef="livre">
               <th mat-header-cell *matHeaderCellDef>Livre</th>
-              <td mat-cell *matCellDef="let e">{{ e.livre.titre }}</td>
+              <td mat-cell *matCellDef="let e">
+                <span class="titre">{{ e.livre.titre }}</span>
+              </td>
             </ng-container>
+
             <ng-container matColumnDef="emprunteur">
               <th mat-header-cell *matHeaderCellDef>Emprunteur</th>
-              <td mat-cell *matCellDef="let e">{{ e.utilisateur.nom }}</td>
+              <td mat-cell *matCellDef="let e" class="muted-cell">{{ e.utilisateur.nom }}</td>
             </ng-container>
+
             <ng-container matColumnDef="dates">
               <th mat-header-cell *matHeaderCellDef>Échéance</th>
               <td mat-cell *matCellDef="let e">
-                {{ e.dateRetourPrevue | date:'dd/MM/yyyy' }}
+                <span class="date">{{ e.dateRetourPrevue | date:'dd/MM/yyyy' }}</span>
                 @if (e.dateRetourEffective) {
-                  <span class="muted"> · rendu {{ e.dateRetourEffective | date:'dd/MM/yyyy' }}</span>
+                  <span class="muted-cell"> · rendu {{ e.dateRetourEffective | date:'dd/MM/yyyy' }}</span>
                 }
               </td>
             </ng-container>
+
             <ng-container matColumnDef="statut">
               <th mat-header-cell *matHeaderCellDef>Statut</th>
-              <td mat-cell *matCellDef="let e"><span class="chip" [class]="statutChip(e)">{{ statutLabel(e) }}</span></td>
+              <td mat-cell *matCellDef="let e">
+                <span class="chip" [class]="statutChip(e)">{{ statutLabel(e) }}</span>
+              </td>
             </ng-container>
+
             <ng-container matColumnDef="actions">
               <th mat-header-cell *matHeaderCellDef></th>
               <td mat-cell *matCellDef="let e" class="actions-cell">
                 @if (!e.dateRetourEffective) {
-                  <button mat-stroked-button (click)="retourner(e)">
+                  <button mat-stroked-button class="btn-return" (click)="retourner(e)">
                     <mat-icon>assignment_return</mat-icon> Enregistrer le retour
                   </button>
                 }
               </td>
             </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="colonnes"></tr>
             <tr mat-row *matRowDef="let row; columns: colonnes;"></tr>
           </table>

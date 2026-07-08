@@ -1,65 +1,91 @@
 <div class="page">
-  <a mat-button routerLink="/catalogue" class="back"><mat-icon>arrow_back</mat-icon> Retour au catalogue</a>
+  <a mat-button routerLink="/catalogue" class="back">
+    <mat-icon>arrow_back</mat-icon> Retour au catalogue
+  </a>
 
   @if (loading()) {
-    <div class="empty-state"><mat-spinner diameter="40" /></div>
-  } @else if (livre(); as l) {
-    <mat-card class="detail-card">
+    <div class="detail-card skeleton" aria-hidden="true">
+      <div class="skeleton-bar"></div>
       <div class="detail-grid">
-        <div class="cover">
-          <mat-icon>menu_book</mat-icon>
+        <div class="cover-col">
+          <div class="skeleton-line skeleton-line--cover"></div>
         </div>
         <div class="info">
-          <h1>{{ l.titre }}</h1>
+          <div class="skeleton-line skeleton-line--eyebrow"></div>
+          <div class="skeleton-line skeleton-line--title"></div>
+          <div class="skeleton-line skeleton-line--author"></div>
+        </div>
+      </div>
+    </div>
+  } @else if (livre(); as l) {
+    <mat-card class="detail-card" [class]="accent(l)">
+      <div class="spine"></div>
+
+      <div class="detail-grid">
+        <div class="cover-col">
+          <div class="cover">{{ initiale(l) }}</div>
+          <div class="cote">
+            <span class="cote-label">Cote</span>
+            <span class="cote-value">{{ cote(l) }}</span>
+          </div>
+        </div>
+
+        <div class="info">
+          @if (l.categorie) { <p class="eyebrow">{{ l.categorie }}</p> }
+          <h1 class="titre">{{ l.titre }}</h1>
 
           <div class="auteurs">
-            <span class="muted">Auteur(s) :</span>
+            <span class="muted">Par</span>
             <mat-chip-set>
               @for (a of l.auteurs; track a.id) {
                 <mat-chip>{{ a.nomComplet }}</mat-chip>
               }
+              @if (!l.auteurs.length) { <mat-chip>Auteur inconnu</mat-chip> }
             </mat-chip-set>
           </div>
 
           <mat-divider />
 
           <dl class="meta">
-            @if (l.categorie) { <dt>Catégorie</dt><dd>{{ l.categorie }}</dd> }
             @if (l.anneePublication) { <dt>Année</dt><dd>{{ l.anneePublication }}</dd> }
             @if (l.isbn) { <dt>ISBN</dt><dd>{{ l.isbn }}</dd> }
             <dt>Stock</dt>
-            <dd>{{ l.stockDisponible }} / {{ l.stockTotal }} disponible(s)</dd>
+            <dd>{{ l.stockDisponible }} / {{ l.stockTotal }} exemplaire{{ l.stockTotal > 1 ? 's' : '' }}</dd>
           </dl>
 
           <div class="statut-ligne">
             @if (l.disponible) {
-              <span class="chip chip-success">Disponible</span>
+              <span class="chip chip-success"><mat-icon>check_circle</mat-icon>Disponible</span>
             } @else {
-              <span class="chip chip-danger">Épuisé</span>
+              <span class="chip chip-danger"><mat-icon>block</mat-icon>Épuisé</span>
               @if (l.fileAttente > 0) {
-                <span class="chip chip-warn">{{ l.fileAttente }} personne(s) en file d'attente</span>
+                <span class="chip chip-warn"><mat-icon>schedule</mat-icon>{{ l.fileAttente }} en file d'attente</span>
               }
             }
           </div>
 
           <div class="actions">
             @if (l.disponible) {
-              <button mat-flat-button color="primary" (click)="emprunter()" [disabled]="action()">
+              <button mat-flat-button class="btn-primary" (click)="emprunter()" [disabled]="action()">
                 <mat-icon>book</mat-icon> Emprunter
               </button>
             } @else {
-              <button mat-flat-button color="accent" (click)="reserver()" [disabled]="action()">
+              <button mat-flat-button class="btn-accent" (click)="reserver()" [disabled]="action()">
                 <mat-icon>bookmark_add</mat-icon> Réserver (file d'attente)
               </button>
             }
             @if (!isLoggedIn()) {
-              <span class="muted hint">Connexion requise pour emprunter/réserver</span>
+              <span class="muted hint"><mat-icon>lock</mat-icon>Connexion requise pour emprunter ou réserver</span>
             }
           </div>
         </div>
       </div>
     </mat-card>
   } @else {
-    <div class="empty-state"><mat-icon>error_outline</mat-icon><p>Livre introuvable</p></div>
+    <div class="empty-state">
+      <mat-icon>error_outline</mat-icon>
+      <p class="empty-title">Livre introuvable</p>
+      <p class="empty-hint">Cet ouvrage n'existe pas ou a été retiré du catalogue.</p>
+    </div>
   }
 </div>

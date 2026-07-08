@@ -1,4 +1,5 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -7,13 +8,20 @@ import { StatsService } from '../../core/api.service';
 import { Ui } from '../../core/ui';
 import { Dashboard } from '../../core/models';
 
-interface Tile { label: string; valeur: number | string; icon: string; accent: string; }
+interface Tile { 
+  label: string; 
+  valeur: number | string; 
+  icon: string; 
+  accent: string; 
+  description?: string;
+  trend?: 'up' | 'down' | 'neutral';
+}
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MatCardModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.scss',
+  styleUrls: ['./dashboard.scss'],
 })
 export class DashboardPage implements OnInit {
   private statsService = inject(StatsService);
@@ -25,15 +33,68 @@ export class DashboardPage implements OnInit {
   tiles = computed<Tile[]>(() => {
     const d = this.data();
     if (!d) return [];
+    
+    const tauxDispo = d.totalExemplaires > 0 ? Math.round((d.exemplairesDisponibles / d.totalExemplaires) * 100) : 0;
+    const tauxRetard = d.empruntsEnCours > 0 ? Math.round((d.empruntsEnRetard / d.empruntsEnCours) * 100) : 0;
+    
     return [
-      { label: 'Livres au catalogue', valeur: d.totalLivres, icon: 'library_books', accent: 'blue' },
-      { label: 'Exemplaires (dispo/total)', valeur: `${d.exemplairesDisponibles}/${d.totalExemplaires}`, icon: 'inventory_2', accent: 'blue' },
-      { label: 'Membres inscrits', valeur: d.totalMembres, icon: 'group', accent: 'blue' },
-      { label: 'Emprunts en cours', valeur: d.empruntsEnCours, icon: 'import_contacts', accent: 'green' },
-      { label: 'En retard', valeur: d.empruntsEnRetard, icon: 'running_with_errors', accent: 'red' },
-      { label: 'Réservations en attente', valeur: d.reservationsEnAttente, icon: 'bookmark', accent: 'amber' },
-      { label: 'Pénalités impayées', valeur: d.penalitesImpayees, icon: 'gavel', accent: 'red' },
-      { label: 'Montant impayé (FCFA)', valeur: d.montantPenalitesImpayees, icon: 'payments', accent: 'amber' },
+      { 
+        label: 'Livres au catalogue', 
+        valeur: d.totalLivres, 
+        icon: 'library_books', 
+        accent: 'blue',
+        description: 'Nombre total de livres référencés'
+      },
+      { 
+        label: 'Exemplaires disponibles', 
+        valeur: `${d.exemplairesDisponibles}/${d.totalExemplaires}`, 
+        icon: 'inventory_2', 
+        accent: 'blue',
+        description: `Taux de disponibilité: ${tauxDispo}%`
+      },
+      { 
+        label: 'Membres inscrits', 
+        valeur: d.totalMembres, 
+        icon: 'group', 
+        accent: 'blue',
+        description: 'Utilisateurs actifs dans la bibliothèque'
+      },
+      { 
+        label: 'Emprunts en cours', 
+        valeur: d.empruntsEnCours, 
+        icon: 'import_contacts', 
+        accent: 'green',
+        description: 'Livres actuellement empruntés'
+      },
+      { 
+        label: 'Emprunts en retard', 
+        valeur: d.empruntsEnRetard, 
+        icon: 'running_with_errors', 
+        accent: 'red',
+        description: `Taux de retard: ${tauxRetard}%`,
+        trend: d.empruntsEnRetard > 0 ? 'down' : 'neutral'
+      },
+      { 
+        label: 'Réservations en attente', 
+        valeur: d.reservationsEnAttente, 
+        icon: 'bookmark', 
+        accent: 'amber',
+        description: 'Livres réservés par les utilisateurs'
+      },
+      { 
+        label: 'Pénalités impayées', 
+        valeur: d.penalitesImpayees, 
+        icon: 'gavel', 
+        accent: 'red',
+        description: 'Nombre de pénalités non réglées'
+      },
+      { 
+        label: 'Montant impayé (FCFA)', 
+        valeur: d.montantPenalitesImpayees.toLocaleString('fr-FR'), 
+        icon: 'payments', 
+        accent: 'amber',
+        description: 'Total des pénalités en attente de paiement'
+      },
     ];
   });
 
@@ -50,14 +111,14 @@ export class DashboardPage implements OnInit {
     this.loading.set(true);
     this.statsService.dashboard().subscribe({
       next: d => { this.data.set(d); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      error: (err: any) => { this.loading.set(false); this.ui.error(err); },
     });
   }
 
   lancerTraitements(): void {
     this.statsService.lancerTraitements().subscribe({
       next: r => { this.ui.success(r.resultat); this.charger(); },
-      error: err => this.ui.error(err),
+      error: (err: any) => this.ui.error(err),
     });
   }
 
@@ -90,5 +151,21 @@ export class DashboardPage implements OnInit {
   pourcentageStatut(n: number): number {
     const t = this.totalStatuts();
     return t === 0 ? 0 : Math.round((n / t) * 100);
+  }
+
+  getTrendIcon(trend?: 'up' | 'down' | 'neutral'): string {
+    switch (trend) {
+      case 'up': return 'trending_up';
+      case 'down': return 'trending_down';
+      default: return 'trending_flat';
+    }
+  }
+
+  getTrendClass(trend?: 'up' | 'down' | 'neutral'): string {
+    switch (trend) {
+      case 'up': return 'trend-up';
+      case 'down': return 'trend-down';
+      default: return 'trend-neutral';
+    }
   }
 }

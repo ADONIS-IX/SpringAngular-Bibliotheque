@@ -64,7 +64,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/livres/**", "/api/auteurs/**")
                         .hasAnyRole("BIBLIOTHECAIRE", "ADMIN")
                         // Espace de gestion (dashboard, retours, pénalités, tous les emprunts…)
-                        .requestMatchers("/api/stats/**", "/api/admin/**").hasAnyRole("BIBLIOTHECAIRE", "ADMIN")
+                        .requestMatchers("/api/stats/**").hasAnyRole("BIBLIOTHECAIRE", "ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         // Tout le reste nécessite d'être authentifié
                         .anyRequest().authenticated()
                 )

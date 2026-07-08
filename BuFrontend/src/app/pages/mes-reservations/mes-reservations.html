@@ -1,50 +1,74 @@
 <div class="page">
-  <div class="page-header"><h1>Mes réservations</h1></div>
+
+  <header class="page-header">
+    <img src="/logo.png" alt="Logo bibliothèque" class="page-logo" />
+    <h1>Mes réservations</h1>
+    <p class="page-subtitle">
+      @if (!loading()) {
+        {{ reservations().length }} réservation{{ reservations().length > 1 ? 's' : '' }}
+      } @else {
+        Chargement de vos réservations…
+      }
+    </p>
+  </header>
 
   @if (loading()) {
-    <div class="empty-state"><mat-spinner diameter="40" /></div>
+    <div class="rows" aria-hidden="true">
+      @for (s of skeletons; track $index) {
+        <div class="resa-row skeleton">
+          <div class="skeleton-line skeleton-line--cover"></div>
+          <div class="row-main">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--details"></div>
+          </div>
+          <div class="skeleton-line skeleton-line--chip"></div>
+        </div>
+      }
+    </div>
   } @else if (reservations().length === 0) {
     <div class="empty-state">
       <mat-icon>bookmark_border</mat-icon>
-      <p>Aucune réservation. Réservez un livre épuisé depuis le catalogue.</p>
+      <p class="empty-title">Aucune réservation</p>
+      <p class="empty-hint">Réservez un livre épuisé depuis le catalogue pour le retrouver ici.</p>
     </div>
   } @else {
-    <div class="cards">
+    <div class="rows">
       @for (r of reservations(); track r.id) {
-        <mat-card class="resa-card" [class.highlight]="r.statut === 'DISPONIBLE'">
-          <mat-card-content>
-            <div class="ligne-titre">
-              <mat-icon>bookmark</mat-icon>
-              <h3>{{ r.livre.titre }}</h3>
-              <span class="spacer"></span>
-              <span class="chip" [class]="statutChip(r.statut)">{{ statutLabel(r.statut) }}</span>
-            </div>
+        <div class="resa-row" [class]="accent(r.statut)" [class.highlight]="r.statut === 'DISPONIBLE'">
+          <span class="cover">
+            <mat-icon>bookmark</mat-icon>
+          </span>
 
-            <div class="details muted">
+          <div class="row-main">
+            <h3 class="titre">{{ r.livre.titre }}</h3>
+            <p class="details">
               Réservé le {{ r.dateReservation | date:'dd/MM/yyyy HH:mm' }}
               @if (r.statut === 'EN_ATTENTE' && r.position) {
                 · <strong>Position {{ r.position }}</strong> dans la file
               }
               @if (r.statut === 'DISPONIBLE' && r.dateExpiration) {
-                · À confirmer avant le <strong>{{ r.dateExpiration | date:'dd/MM/yyyy HH:mm' }}</strong>
+                · à confirmer avant le <strong>{{ r.dateExpiration | date:'dd/MM/yyyy HH:mm' }}</strong>
               }
-            </div>
+            </p>
+          </div>
 
-            @if (active(r)) {
-              <div class="actions">
-                @if (r.statut === 'DISPONIBLE') {
-                  <button mat-flat-button color="primary" (click)="confirmer(r)">
-                    <mat-icon>check</mat-icon> Confirmer l'emprunt
-                  </button>
-                }
-                <button mat-stroked-button (click)="annuler(r)">
-                  <mat-icon>close</mat-icon> Annuler
+          <span class="chip" [class]="statutChip(r.statut)">{{ statutLabel(r.statut) }}</span>
+
+          @if (active(r)) {
+            <div class="actions">
+              @if (r.statut === 'DISPONIBLE') {
+                <button mat-flat-button class="btn-confirm" (click)="confirmer(r)">
+                  <mat-icon>check</mat-icon> Confirmer
                 </button>
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
+              }
+              <button mat-stroked-button class="btn-cancel" (click)="annuler(r)">
+                <mat-icon>close</mat-icon> Annuler
+              </button>
+            </div>
+          }
+        </div>
       }
     </div>
   }
+
 </div>

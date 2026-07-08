@@ -2,6 +2,21 @@
 
 export type Role = 'ETUDIANT' | 'BIBLIOTHECAIRE' | 'ADMIN';
 
+export interface CreateUserRequest {
+  nom: string;
+  email: string;
+  password: string;
+  role: Role;
+}
+
+export interface UpdateUserRequest {
+  nom: string;
+  email?: string;
+  password?: string;
+  role: Role;
+  actif: boolean;
+}
+
 export interface AuthResponse {
   token: string;
   type: string;
@@ -95,6 +110,7 @@ export interface Notification {
   type: 'ECHEANCE_PROCHE' | 'RETARD' | 'RESERVATION_DISPONIBLE' | 'INFO';
   lue: boolean;
   dateCreation: string;
+  reservationId?: number;
 }
 
 export interface Dashboard {

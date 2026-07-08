@@ -10,6 +10,7 @@ import { LivreService, AuteurService } from '../../core/api.service';
 import { Ui } from '../../core/ui';
 import { Auteur, Livre } from '../../core/models';
 import { LivreDialog } from './livre-dialog';
+import { ConfirmDialog } from '../../core/confirm-dialog';
 
 @Component({
   selector: 'app-gestion-livres',
@@ -68,10 +69,21 @@ export class GestionLivres implements OnInit {
   }
 
   supprimer(livre: Livre): void {
-    if (!confirm(`Supprimer « ${livre.titre} » ?`)) return;
-    this.livreService.supprimer(livre.id).subscribe({
-      next: () => { this.ui.success('Livre supprimé'); this.charger(); },
-      error: err => this.ui.error(err),
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        titre: 'Supprimer ce livre ?',
+        message: `« ${livre.titre} » sera définitivement retiré du catalogue.`,
+        detail: 'Cette action est irréversible.',
+        confirmLabel: 'Supprimer',
+        danger: true,
+      },
+    });
+    ref.afterClosed().subscribe(confirme => {
+      if (!confirme) return;
+      this.livreService.supprimer(livre.id).subscribe({
+        next: () => { this.ui.success('Livre supprimé'); this.charger(); },
+        error: err => this.ui.error(err),
+      });
     });
   }
 }

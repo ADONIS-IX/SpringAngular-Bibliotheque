@@ -22,6 +22,11 @@ public class NotificationService {
     }
 
     /** Crée une notification pour un utilisateur (utilisé par les autres services). */
+    public Notification creer(Notification notification) {
+        return notificationRepository.save(notification);
+    }
+
+    /** Crée une notification simple pour un utilisateur (utilisé par les autres services). */
     public Notification creer(Utilisateur destinataire, String message, Notification.Type type) {
         return notificationRepository.save(new Notification(destinataire, message, type));
     }
