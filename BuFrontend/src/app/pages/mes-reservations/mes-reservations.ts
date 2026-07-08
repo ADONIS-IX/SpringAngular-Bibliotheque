@@ -33,24 +33,24 @@ export class MesReservations implements OnInit {
     this.loading.set(true);
     this.reservationService.mesReservations().subscribe({
       next: r => { this.reservations.set(r); this.loading.set(false); },
-      error: err => { this.loading.set(false); this.ui.error(err); },
+      error: (err: any) => { this.loading.set(false); this.ui.error(err); },
     });
   }
 
   confirmer(r: Reservation): void {
-    this.reservationService.confirmer(r.id).subscribe({
+    this.reservationService.confirmerPrise(r.id).subscribe({
       next: () => {
         this.ui.success(`« ${r.livre.titre} » emprunté avec succès !`);
         this.router.navigate(['/mes-emprunts']);
       },
-      error: err => this.ui.error(err),
+      error: (err: any) => this.ui.error(err),
     });
   }
 
   annuler(r: Reservation): void {
     this.reservationService.annuler(r.id).subscribe({
       next: () => { this.ui.success('Réservation annulée'); this.charger(); },
-      error: err => this.ui.error(err),
+      error: (err: any) => this.ui.error(err),
     });
   }
 

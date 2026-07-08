@@ -153,6 +153,13 @@ public class EmpruntService {
     // ── Helpers ──────────────────────────────────────────────
 
     private void validerEligibilite(Long utilisateurId, Livre livre) {
+        Utilisateur user = utilisateurRepository.findById(utilisateurId)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + utilisateurId));
+        
+        if (user.getRole() == Utilisateur.Role.ADMIN) {
+            throw new ConflictException("Les administrateurs ne peuvent pas emprunter de livres");
+        }
+        
         if (penaliteRepository.existsByEmpruntUtilisateurIdAndStatut(utilisateurId, Penalite.Statut.NON_PAYEE)) {
             throw new ConflictException("Vous avez une pénalité impayée : régularisez-la avant d'emprunter");
         }

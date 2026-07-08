@@ -110,6 +110,7 @@ export interface Notification {
   type: 'ECHEANCE_PROCHE' | 'RETARD' | 'RESERVATION_DISPONIBLE' | 'INFO';
   lue: boolean;
   dateCreation: string;
+  reservationId?: number;
 }
 
 export interface Dashboard {

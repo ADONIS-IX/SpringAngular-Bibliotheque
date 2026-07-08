@@ -7,6 +7,7 @@ public record NotificationDto(
         String message,
         String type,
         boolean lue,
-        LocalDateTime dateCreation
+        LocalDateTime dateCreation,
+        Long reservationId
 ) {
 }
