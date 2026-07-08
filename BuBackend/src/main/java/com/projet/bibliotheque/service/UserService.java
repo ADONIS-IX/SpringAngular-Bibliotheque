@@ -4,6 +4,9 @@ import com.projet.bibliotheque.dto.UpdateUserRequest;
 import com.projet.bibliotheque.exception.ConflictException;
 import com.projet.bibliotheque.exception.ResourceNotFoundException;
 import com.projet.bibliotheque.model.Utilisateur;
+import com.projet.bibliotheque.repository.EmpruntRepository;
+import com.projet.bibliotheque.repository.NotificationRepository;
+import com.projet.bibliotheque.repository.ReservationRepository;
 import com.projet.bibliotheque.repository.UtilisateurRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService implements UserDetailsService {
 
     private final UtilisateurRepository utilisateurRepository;
+    private final EmpruntRepository empruntRepository;
+    private final ReservationRepository reservationRepository;
+    private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UtilisateurRepository utilisateurRepository, EmpruntRepository empruntRepository,
+                       ReservationRepository reservationRepository, NotificationRepository notificationRepository,
+                       PasswordEncoder passwordEncoder) {
         this.utilisateurRepository = utilisateurRepository;
+        this.empruntRepository = empruntRepository;
+        this.reservationRepository = reservationRepository;
+        this.notificationRepository = notificationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -97,10 +108,17 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long id) {
-        if (!utilisateurRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Utilisateur introuvable : " + id);
+        Utilisateur u = utilisateurRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Utilisateur introuvable : " + id));
+        // Un compte lié à des emprunts/réservations ne peut pas être supprimé sans casser
+        // l'historique (contrainte FK) : on oriente vers la désactivation (actif = false).
+        if (empruntRepository.existsByUtilisateurId(id) || reservationRepository.existsByUtilisateurId(id)) {
+            throw new ConflictException("Impossible de supprimer un utilisateur ayant un historique d'emprunts "
+                    + "ou de réservations. Désactivez plutôt son compte.");
         }
-        utilisateurRepository.deleteById(id);
+        // Les notifications lui appartiennent en propre : on les purge pour libérer la FK.
+        notificationRepository.deleteByUtilisateurId(id);
+        utilisateurRepository.delete(u);
     }
 
     @Transactional(readOnly = true)

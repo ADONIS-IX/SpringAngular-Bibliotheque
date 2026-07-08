@@ -5,9 +5,12 @@ import com.projet.bibliotheque.dto.ReservationDto;
 import com.projet.bibliotheque.exception.ConflictException;
 import com.projet.bibliotheque.model.Livre;
 import com.projet.bibliotheque.model.Notification;
+import com.projet.bibliotheque.model.Penalite;
 import com.projet.bibliotheque.model.Reservation;
 import com.projet.bibliotheque.model.Utilisateur;
+import com.projet.bibliotheque.repository.EmpruntRepository;
 import com.projet.bibliotheque.repository.LivreRepository;
+import com.projet.bibliotheque.repository.PenaliteRepository;
 import com.projet.bibliotheque.repository.ReservationRepository;
 import com.projet.bibliotheque.repository.UtilisateurRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +36,8 @@ class ReservationServiceTest {
     @Mock ReservationRepository reservationRepository;
     @Mock LivreRepository livreRepository;
     @Mock UtilisateurRepository utilisateurRepository;
+    @Mock EmpruntRepository empruntRepository;
+    @Mock PenaliteRepository penaliteRepository;
     @Mock NotificationService notificationService;
 
     DtoMapper mapper = new DtoMapper();
@@ -46,7 +51,7 @@ class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         service = new ReservationService(reservationRepository, livreRepository, utilisateurRepository,
-                notificationService, mapper, props);
+                empruntRepository, penaliteRepository, notificationService, mapper, props);
         user = new Utilisateur();
         user.setId(1L);
         user.setNom("Fatou Ndiaye");
@@ -77,6 +82,30 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> service.reserver(1L, 10L))
                 .isInstanceOf(ConflictException.class)
                 .hasMessageContaining("déjà une réservation");
+    }
+
+    @Test
+    void reserver_refuse_si_penalite_impayee() {
+        when(utilisateurRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(livreRepository.findById(10L)).thenReturn(Optional.of(livre));
+        when(penaliteRepository.existsByEmpruntUtilisateurIdAndStatut(1L, Penalite.Statut.NON_PAYEE))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> service.reserver(1L, 10L))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("pénalité impayée");
+    }
+
+    @Test
+    void reserver_refuse_si_l_utilisateur_detient_deja_le_livre() {
+        when(utilisateurRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(livreRepository.findById(10L)).thenReturn(Optional.of(livre));
+        when(empruntRepository.existsByUtilisateurIdAndLivreIdAndDateRetourEffectiveIsNull(1L, 10L))
+                .thenReturn(true);
+
+        assertThatThrownBy(() -> service.reserver(1L, 10L))
+                .isInstanceOf(ConflictException.class)
+                .hasMessageContaining("détenez déjà");
     }
 
     @Test

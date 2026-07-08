@@ -6,9 +6,12 @@ import com.projet.bibliotheque.exception.ConflictException;
 import com.projet.bibliotheque.exception.ResourceNotFoundException;
 import com.projet.bibliotheque.model.Livre;
 import com.projet.bibliotheque.model.Notification;
+import com.projet.bibliotheque.model.Penalite;
 import com.projet.bibliotheque.model.Reservation;
 import com.projet.bibliotheque.model.Utilisateur;
+import com.projet.bibliotheque.repository.EmpruntRepository;
 import com.projet.bibliotheque.repository.LivreRepository;
+import com.projet.bibliotheque.repository.PenaliteRepository;
 import com.projet.bibliotheque.repository.ReservationRepository;
 import com.projet.bibliotheque.repository.UtilisateurRepository;
 import org.springframework.stereotype.Service;
@@ -24,16 +27,21 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final LivreRepository livreRepository;
     private final UtilisateurRepository utilisateurRepository;
+    private final EmpruntRepository empruntRepository;
+    private final PenaliteRepository penaliteRepository;
     private final NotificationService notificationService;
     private final DtoMapper mapper;
     private final BiblioProperties props;
 
     public ReservationService(ReservationRepository reservationRepository, LivreRepository livreRepository,
-                              UtilisateurRepository utilisateurRepository, NotificationService notificationService,
+                              UtilisateurRepository utilisateurRepository, EmpruntRepository empruntRepository,
+                              PenaliteRepository penaliteRepository, NotificationService notificationService,
                               DtoMapper mapper, BiblioProperties props) {
         this.reservationRepository = reservationRepository;
         this.livreRepository = livreRepository;
         this.utilisateurRepository = utilisateurRepository;
+        this.empruntRepository = empruntRepository;
+        this.penaliteRepository = penaliteRepository;
         this.notificationService = notificationService;
         this.mapper = mapper;
         this.props = props;
@@ -44,8 +52,22 @@ public class ReservationService {
         Utilisateur user = getUser(utilisateurId);
         Livre livre = getLivre(livreId);
 
+        // Éligibilité stable, alignée sur l'emprunt : un admin ou un lecteur pénalisé ne doit pas
+        // entrer dans la file (il serait de toute façon bloqué à la confirmation). Le quota
+        // d'emprunts simultanés reste, lui, vérifié à la confirmation car il peut évoluer d'ici là.
+        if (user.getRole() == Utilisateur.Role.ADMIN) {
+            throw new ConflictException("Les administrateurs ne peuvent pas réserver de livres");
+        }
+        if (penaliteRepository.existsByEmpruntUtilisateurIdAndStatut(utilisateurId, Penalite.Statut.NON_PAYEE)) {
+            throw new ConflictException("Vous avez une pénalité impayée : régularisez-la avant de réserver");
+        }
+
         if (livre.getStockDisponible() > 0) {
             throw new ConflictException("Ce livre est disponible : empruntez-le directement plutôt que de le réserver");
+        }
+        if (empruntRepository.existsByUtilisateurIdAndLivreIdAndDateRetourEffectiveIsNull(utilisateurId, livreId)) {
+            throw new ConflictException("Vous détenez déjà un exemplaire de ce livre en cours d'emprunt : "
+                    + "inutile de le réserver");
         }
         boolean dejaEnFile = reservationRepository.existsByUtilisateurIdAndLivreIdAndStatutIn(
                 utilisateurId, livreId, List.of(Reservation.Statut.EN_ATTENTE, Reservation.Statut.DISPONIBLE));

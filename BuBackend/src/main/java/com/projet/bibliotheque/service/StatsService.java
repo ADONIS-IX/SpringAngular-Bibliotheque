@@ -50,13 +50,20 @@ public class StatsService {
                 .filter(p -> p.getStatut() == Penalite.Statut.NON_PAYEE).count();
         BigDecimal montantImpaye = penaliteRepository.totalParStatut(Penalite.Statut.NON_PAYEE);
 
+        // « En cours » = emprunts actifs (non rendus, échus inclus) ; « en retard » = actifs
+        // dont l'échéance est dépassée. Basé sur les dates, donc cohérent en temps réel avec
+        // la liste /emprunts/retards, et garantit un taux de retard toujours ≤ 100 %.
+        long empruntsEnCours = empruntRepository.countByDateRetourEffectiveIsNull();
+        long empruntsEnRetard = empruntRepository
+                .countByDateRetourEffectiveIsNullAndDateRetourPrevueBefore(LocalDate.now());
+
         return new DashboardDto(
                 livreRepository.count(),
                 totalExemplaires,
                 exemplairesDispo,
                 utilisateurRepository.count(),
-                empruntRepository.countByStatut(Emprunt.Statut.EN_COURS),
-                empruntRepository.countByStatut(Emprunt.Statut.EN_RETARD),
+                empruntsEnCours,
+                empruntsEnRetard,
                 reservationRepository.countByStatut(Reservation.Statut.EN_ATTENTE),
                 penalitesImpayees,
                 montantImpaye == null ? BigDecimal.ZERO : montantImpaye,

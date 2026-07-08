@@ -47,8 +47,10 @@ export class ReservationService {
   private http = inject(HttpClient);
   reserver(livreId: number): Observable<Reservation> { return this.http.post<Reservation>('/api/reservations', { livreId }); }
   mesReservations(): Observable<Reservation[]> { return this.http.get<Reservation[]>('/api/reservations/mes-reservations'); }
-  confirmerPrise(id: number): Observable<Emprunt> { return this.http.post<Emprunt>(`/api/reservations/${id}/confirmer-prise`, {}); }
-  refuserPrise(id: number): Observable<void> { return this.http.post<void>(`/api/reservations/${id}/refuser-prise`, {}); }
+  confirmerPrise(id: number): Observable<Emprunt> { return this.http.post<Emprunt>(`/api/reservations/${id}/confirmer`, {}); }
+  // « Refuser la prise » = annuler la réservation disponible : le back passe alors l'exemplaire
+  // au suivant de la file (libererExemplaire). Même endpoint que annuler().
+  refuserPrise(id: number): Observable<void> { return this.http.delete<void>(`/api/reservations/${id}`); }
   annuler(id: number): Observable<void> { return this.http.delete<void>(`/api/reservations/${id}`); }
   toutes(): Observable<Reservation[]> { return this.http.get<Reservation[]>('/api/reservations'); }
 }

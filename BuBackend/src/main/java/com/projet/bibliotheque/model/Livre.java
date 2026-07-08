@@ -30,12 +30,12 @@ public class Livre {
     @Column(nullable = false)
     private Integer stockDisponible = 1;
 
-    @Lob
-    @Column(name = "image_url", columnDefinition = "LONGTEXT")
+    // Couverture en base64 (data URI). Longueur portable : Hibernate mappe en
+    // (MEDIUM/LONG)TEXT sur MySQL et en grand VARCHAR/CLOB sur H2 — pas de DDL brut.
+    @Column(name = "image_url", length = 5_000_000)
     private String imageUrl;
 
-    @Lob
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 2000)
     private String description;
 
     // Relation N,N : un livre peut avoir plusieurs auteurs et inversement

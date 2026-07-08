@@ -23,6 +23,17 @@ public interface EmpruntRepository extends JpaRepository<Emprunt, Long> {
 
     long countByStatut(Emprunt.Statut statut);
 
+    // Emprunts actifs (non rendus) — indépendant du champ statut, donc temps réel
+    long countByDateRetourEffectiveIsNull();
+
+    // Emprunts actifs dont l'échéance est dépassée : la vraie mesure « en retard maintenant »
+    long countByDateRetourEffectiveIsNullAndDateRetourPrevueBefore(LocalDate date);
+
+    // Intégrité référentielle avant suppression
+    boolean existsByUtilisateurId(Long utilisateurId);
+
+    boolean existsByLivreId(Long livreId);
+
     // Emprunts dont l'échéance est dépassée et le livre pas encore rendu
     List<Emprunt> findByDateRetourEffectiveIsNullAndDateRetourPrevueBefore(LocalDate date);
 

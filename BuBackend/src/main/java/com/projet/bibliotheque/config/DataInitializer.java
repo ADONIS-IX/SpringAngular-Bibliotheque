@@ -47,7 +47,7 @@ public class DataInitializer implements CommandLineRunner {
         }
         log.info("Initialisation des données de démonstration…");
 
-        // ── Auteurs ──────────────────────────────────────────
+        // Auteurs
         Auteur hugo = auteur("Hugo", "Victor", "Française");
         Auteur martin = auteur("Martin", "Robert C.", "Américaine");
         Auteur walls = auteur("Walls", "Craig", "Américaine");
@@ -59,7 +59,7 @@ public class DataInitializer implements CommandLineRunner {
         Auteur johnson = auteur("Johnson", "Ralph", "Américaine");
         Auteur vlissides = auteur("Vlissides", "John", "Américaine");
 
-        // ── Livres ───────────────────────────────────────────
+        // Livres
         Livre miserables = livre("Les Misérables", "9782070409228", 1862, "Roman", 3, List.of(hugo));
         Livre cleanCode = livre("Clean Code", "9780132350884", 2008, "Informatique", 1, List.of(martin));
         Livre spring = livre("Spring in Action", "9781617294945", 2018, "Informatique", 4, List.of(walls));
@@ -68,24 +68,24 @@ public class DataInitializer implements CommandLineRunner {
         Livre designPatterns = livre("Design Patterns", "9780201633610", 1994, "Informatique", 2,
                 List.of(gamma, helm, johnson, vlissides));
 
-        // ── Utilisateurs ─────────────────────────────────────
+        // Utilisateurs  
         utilisateur("Admin Biblio", "admin@universite.sn", "Admin2024!", Utilisateur.Role.ADMIN);
         utilisateur("Awa Bibliothécaire", "biblio@universite.sn", "Biblio2024!", Utilisateur.Role.BIBLIOTHECAIRE);
         Utilisateur etu1 = utilisateur("Moussa Diop", "etudiant@universite.sn", "Etudiant2024!", Utilisateur.Role.ETUDIANT);
         Utilisateur etu2 = utilisateur("Fatou Ndiaye", "fatou@universite.sn", "Etudiant2024!", Utilisateur.Role.ETUDIANT);
         Utilisateur etu3 = utilisateur("Cheikh Fall", "cheikh@universite.sn", "Etudiant2024!", Utilisateur.Role.ETUDIANT);
 
-        // ── Emprunt EN RETARD (échéance dépassée) ────────────
-        emprunt(etu1, miserables, LocalDate.now().minusDays(20), LocalDate.now().minusDays(6), Emprunt.Statut.EN_COURS);
+        // Emprunt EN RETARD (échéance dépassée) — statut cohérent avec la réalité de la date
+        emprunt(etu1, miserables, LocalDate.now().minusDays(20), LocalDate.now().minusDays(6), Emprunt.Statut.EN_RETARD);
         decrementer(miserables);
 
-        // ── Livre épuisé + file d'attente de réservations ────
+        // Livre épuisé + file d'attente de réservations
         emprunt(etu1, cleanCode, LocalDate.now().minusDays(2), LocalDate.now().plusDays(12), Emprunt.Statut.EN_COURS);
         decrementer(cleanCode); // stock passe à 0
         reservation(etu2, cleanCode, LocalDateTime.now().minusDays(1));  // 1er de la file
         reservation(etu3, cleanCode, LocalDateTime.now().minusHours(3)); // 2e de la file
 
-        // ── Historique rendu (pour les graphiques du dashboard) ──
+        // Historique rendu (pour les graphiques du dashboard)
         emprunt(etu2, spring, LocalDate.now().minusMonths(2).minusDays(3),
                 LocalDate.now().minusMonths(2).plusDays(11), Emprunt.Statut.RENDU,
                 LocalDate.now().minusMonths(2).plusDays(5));
@@ -96,7 +96,7 @@ public class DataInitializer implements CommandLineRunner {
                 Emprunt.Statut.EN_COURS);
         decrementer(petitPrince);
 
-        log.info("✅ Données de démo insérées. Comptes : admin@universite.sn / biblio@universite.sn / etudiant@universite.sn");
+        log.info("Données de démo insérées. Comptes : admin@universite.sn / biblio@universite.sn / etudiant@universite.sn");
     }
 
     private Auteur auteur(String nom, String prenom, String nationalite) {

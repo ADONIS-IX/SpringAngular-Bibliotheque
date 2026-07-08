@@ -8,6 +8,7 @@ import com.projet.bibliotheque.model.Auteur;
 import com.projet.bibliotheque.model.Livre;
 import com.projet.bibliotheque.model.Reservation;
 import com.projet.bibliotheque.repository.AuteurRepository;
+import com.projet.bibliotheque.repository.EmpruntRepository;
 import com.projet.bibliotheque.repository.LivreRepository;
 import com.projet.bibliotheque.repository.ReservationRepository;
 import org.springframework.stereotype.Service;
@@ -22,13 +23,16 @@ public class LivreService {
     private final LivreRepository livreRepository;
     private final AuteurRepository auteurRepository;
     private final ReservationRepository reservationRepository;
+    private final EmpruntRepository empruntRepository;
     private final DtoMapper mapper;
 
     public LivreService(LivreRepository livreRepository, AuteurRepository auteurRepository,
-                        ReservationRepository reservationRepository, DtoMapper mapper) {
+                        ReservationRepository reservationRepository, EmpruntRepository empruntRepository,
+                        DtoMapper mapper) {
         this.livreRepository = livreRepository;
         this.auteurRepository = auteurRepository;
         this.reservationRepository = reservationRepository;
+        this.empruntRepository = empruntRepository;
         this.mapper = mapper;
     }
 
@@ -78,7 +82,13 @@ public class LivreService {
     public void supprimer(Long id) {
         Livre livre = getLivre(id);
         if (livre.getStockDisponible() < livre.getStockTotal()) {
-            throw new ConflictException("Impossible de supprimer un livre avec des exemplaires empruntés");
+            throw new ConflictException("Impossible de supprimer un livre avec des exemplaires empruntés ou réservés");
+        }
+        // Même tous exemplaires rentrés, un historique d'emprunts/réservations garde des FK
+        // vers ce livre : refuser proprement plutôt que de laisser remonter une erreur 500.
+        if (empruntRepository.existsByLivreId(id) || reservationRepository.existsByLivreId(id)) {
+            throw new ConflictException("Impossible de supprimer un livre ayant un historique d'emprunts "
+                    + "ou de réservations");
         }
         livreRepository.delete(livre);
     }
